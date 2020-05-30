@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/clockFragment">
+
+    <fragment
+        android:id="@+id/clockFragment"
+        android:name="io.github.gianpamx.pdd.clock.ClockFragment"
+        android:label="Clock"
+        tools:layout="@layout/clock_fragment" />
+</navigation>

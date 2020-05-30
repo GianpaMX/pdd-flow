@@ -1,0 +1,66 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion sdk.compile
+
+    defaultConfig {
+        applicationId "io.github.gianpamx.pdd"
+        minSdkVersion sdk.min
+        targetSdkVersion sdk.target
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+
+dependencies {
+    implementation libraries.kotlin.kotlin
+    implementation libraries.androidx.material
+    implementation libraries.androidx.appcompat
+    implementation libraries.androidx.ktx
+    implementation libraries.androidx.constraintLayout
+
+    kapt libraries.dagger.compiler
+    implementation libraries.dagger.dagger
+    implementation libraries.dagger.support
+    kapt libraries.dagger.processor
+    kaptAndroidTest libraries.dagger.processor
+
+    implementation libraries.navigation.fragment
+    implementation libraries.navigation.ui
+    androidTestImplementation libraries.navigation.testing
+
+    implementation libraries.lifecycle.extensions
+    kapt libraries.lifecycle.compiler
+    implementation libraries.lifecycle.ktx
+
+
+    testImplementation libraries.testing.junit
+
+
+    androidTestImplementation libraries.testing.androidjunitx
+    androidTestImplementation libraries.testing.androidjunitktx
+    androidTestImplementation libraries.testing.corektx
+    androidTestImplementation libraries.testing.espresso
+    androidTestImplementation libraries.testing.assertj
+}
