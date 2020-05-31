@@ -53,6 +53,7 @@ dependencies {
     implementation libraries.lifecycle.extensions
     kapt libraries.lifecycle.compiler
     implementation libraries.lifecycle.ktx
+    implementation libraries.lifecycle.livedata
 
 
     testImplementation libraries.testing.junit
