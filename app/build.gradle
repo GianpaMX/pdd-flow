@@ -13,7 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "io.github.gianpamx.CustomTestRunner"
     }
 
     buildTypes {
@@ -34,6 +34,8 @@ android {
 }
 
 dependencies {
+    implementation project(':domain')
+
     implementation libraries.kotlin.kotlin
     implementation libraries.androidx.material
     implementation libraries.androidx.appcompat
@@ -57,11 +59,16 @@ dependencies {
 
 
     testImplementation libraries.testing.junit
-
+    testImplementation libraries.testing.assertj
+    testImplementation libraries.testing.mockitoKotlin2
+    testImplementation libraries.androidx.testing
+    testImplementation libraries.kotlin.test
 
     androidTestImplementation libraries.testing.androidjunitx
     androidTestImplementation libraries.testing.androidjunitktx
     androidTestImplementation libraries.testing.corektx
     androidTestImplementation libraries.testing.espresso
-    androidTestImplementation libraries.testing.assertj
+    debugImplementation libraries.testing.fragments
+
+    androidTestImplementation libraries.testing.dexmaker
 }

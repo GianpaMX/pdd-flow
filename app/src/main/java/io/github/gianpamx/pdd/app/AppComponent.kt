@@ -7,7 +7,12 @@ import io.github.gianpamx.pdd.MainActivity
 
 @AppScope
 @Component(
-    modules = [AppModule::class, FactoriesModule::class, BindingModule::class]
+    modules = [
+        AppModule::class,
+        FactoriesModule::class,
+        BindingModule::class,
+        DomainModule::class
+    ]
 )
 interface AppComponent {
     fun inject(app: App)
