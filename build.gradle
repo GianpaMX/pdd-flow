@@ -24,6 +24,12 @@ allprojects {
     }
 }
 
+subprojects {
+    afterEvaluate { project ->
+        project.apply from: '../jacoco.gradle'
+    }
+}
+
 project.ext {
     CONFIG = { k -> "\"${project.properties.get(k)}\"" }
 }
