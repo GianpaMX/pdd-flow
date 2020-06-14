@@ -1,0 +1,115 @@
+language: generic
+dist: bionic
+
+env:
+  global:
+    - ANDROID_TOOLS=4333796 # android-28
+    - ANDROID_HOME=${HOME}/android-sdk
+    - GRAVIS="https://raw.githubusercontent.com/DanySK/Gravis-CI/master/"
+    - JDK="1.8" # the JDK used for running tests
+    - TOOLS=${ANDROID_HOME}/tools
+    - PATH=${ANDROID_HOME}/platform-tools:${PATH}
+    - PATH=${TOOLS}/bin:${PATH}
+    - PATH=${TOOLS}:${PATH}
+    - PATH=${ANDROID_HOME}/emulator:${PATH}
+    - PATH=${ANDROID_HOME}:${PATH}
+    - GOO=default
+  jobs:
+    - API=29 ABI=x86_64
+    - API=23 ABI=armeabi-v7a
+jobs:
+  fast_finish: true
+  # jobs that are flakey or fail consistently
+  allow_failures:
+    - env: API=29 ABI=x86_64 # hangs while resolving gradle dependencies, etc...
+
+before_install:
+  - java -version
+
+  # Set up KVM
+  - sudo apt-get -y --no-install-recommends install bridge-utils libpulse0 libvirt-bin qemu-kvm virtinst ubuntu-vm-builder > /dev/null
+  # add travis user to groups
+  - sudo adduser $USER libvirt
+  - sudo adduser $USER kvm
+
+  # Set up JDK 8 for Android SDK
+  - curl "${GRAVIS}.install-jdk-travis.sh" --output ~/.install-jdk-travis.sh
+  - export TARGET_JDK="${JDK}"
+  - JDK="1.8" # used when running sdkmanager
+  - source ~/.install-jdk-travis.sh
+
+  # Set up Android SDK
+  - wget -q "https://dl.google.com/android/repository/sdk-tools-linux-$ANDROID_TOOLS.zip" -O android-sdk-tools.zip
+  - unzip -q android-sdk-tools.zip -d ${ANDROID_HOME}
+  - rm android-sdk-tools.zip
+
+  # Avoid harmless sdkmanager warning
+  - mkdir ~/.android
+  - echo 'count=0' > ~/.android/repositories.cfg
+
+  # Accept licenses before installing components, no need to echo y for each component
+  - yes | sdkmanager --licenses >/dev/null
+
+install:
+  # Download SDK tools
+  - sdkmanager "platform-tools" >/dev/null
+  - sdkmanager "tools" >/dev/null # A second time per Travis docs, gets latest versions
+  - sdkmanager "platforms;android-$API" >/dev/null # We need the API of the emulator we will run
+  - sdkmanager "platforms;android-29" >/dev/null # We need the API of the current compileSdkVersion from gradle.properties  -
+
+  - sdkmanager "emulator" >/dev/null
+  - |
+    if [[ $ABI =~ "arm" ]]; then
+      # Download a pinned version of the emulator since default version can cause issues
+      ${ANDROID_HOME}/emulator/emulator -version
+      emulator_version=5264690 # 29.2.1.0 (build_id 5889189) ==> 28.0.23.0 (build_id 5264690)
+      # sudo apt-get install -y libunwind8 libc++1
+      curl -fo emulator.zip "https://dl.google.com/android/repository/emulator-linux-$emulator_version.zip"
+      rm -rf "${ANDROID_HOME}/emulator"
+      unzip -q emulator.zip -d "${ANDROID_HOME}"
+      rm -f emulator.zip
+      # install build tools and platforms for arm (to allow emulator to run)
+      sdkmanager "build-tools;25.0.2" "platforms;android-25" > /dev/null
+    fi
+  - ${ANDROID_HOME}/emulator/emulator -version
+
+  - sdkmanager "extras;android;m2repository" >/dev/null
+  - sdkmanager "system-images;android-$API;$GOO;$ABI" >/dev/null # install system images for emulator
+
+  # Create an Android emulator
+  - echo no | avdmanager --verbose create avd --force -n test -k "system-images;android-$API;$GOO;$ABI"
+  - EMU_PARAMS="
+    -avd test
+    -verbose
+    -no-window
+    -no-audio
+    "
+  - EMU_COMMAND="emulator"
+  - |
+    if [[ $ABI =~ "arm" ]]; then
+      # emulate graphics if running on ARM
+      EMU_PARAMS="${EMU_PARAMS} -gpu swiftshader"
+    else
+      # x86_64
+      EMU_PARAMS="${EMU_PARAMS} -no-snapshot -camera-back none -camera-front none -selinux permissive -qemu -m 2048"
+    fi
+  # This double "sudo" monstrosity is used to have Travis execute the
+  # emulator with its new group permissions and help preserve the rule
+  # of least privilege.
+  - sudo -E sudo -u $USER -E bash -c "${ANDROID_HOME}/emulator/${EMU_COMMAND} ${EMU_PARAMS} &"
+
+  # Switch back to our target JDK version to build and run tests
+  - JDK="${TARGET_JDK}"
+  - source ~/.install-jdk-travis.sh
+
+before_script:
+  - ./gradlew --console=plain :app:assembleDebug :app:assembleAndroidTest
+  - ./script/android-wait-for-emulator.sh
+
+  - adb shell settings put global window_animation_scale 0 &
+  - adb shell settings put global transition_animation_scale 0 &
+  - adb shell settings put global animator_duration_scale 0 &
+  - adb shell input keyevent 82
+
+script:
+  - ./gradlew --console=plain jacocoTestReport
