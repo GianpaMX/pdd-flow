@@ -113,3 +113,9 @@ before_script:
 
 script:
   - ./gradlew --console=plain jacocoTestReport
+
+after_success:
+  - |
+    if [[ $ABI =~ "arm" ]]; then
+      bash <(curl -s https://codecov.io/bash) -f ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+    fi
