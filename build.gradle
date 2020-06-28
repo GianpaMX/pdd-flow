@@ -5,7 +5,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.0'
@@ -20,7 +19,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
     }
 }
 
@@ -30,10 +28,36 @@ subprojects {
     }
 }
 
-project.ext {
-    CONFIG = { k -> "\"${project.properties.get(k)}\"" }
+apply plugin: "jacoco"
+apply plugin: 'org.jetbrains.kotlin.jvm'
+
+task jacocoFullTestReport(type: JacocoReport) {
+    dependsOn "domain:jacocoTestReport", "app:jacocoTestReport"
+
+    sourceDirectories.from = files(
+            tasks.getByPath("domain:jacocoTestReport").sourceDirectories,
+            tasks.getByPath("app:jacocoTestReport").sourceDirectories
+    )
+    classDirectories.from = files(
+            tasks.getByPath("domain:jacocoTestReport").classDirectories,
+            tasks.getByPath("app:jacocoTestReport").classDirectories
+    )
+    executionData.from = files(
+            tasks.getByPath("domain:jacocoTestReport").executionData,
+            tasks.getByPath("app:jacocoTestReport").executionData
+    )
+    executionData.from = files(
+            tasks.getByPath("domain:jacocoTestReport").executionData,
+            tasks.getByPath("app:jacocoTestReport").executionData
+    )
+
+    reports {
+        csv.enabled false
+        xml.enabled true
+        html.enabled true
+    }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+project.ext {
+    CONFIG = { k -> "\"${project.properties.get(k)}\"" }
 }

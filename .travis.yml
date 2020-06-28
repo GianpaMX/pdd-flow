@@ -112,10 +112,10 @@ before_script:
   - adb shell input keyevent 82
 
 script:
-  - ./gradlew --console=plain jacocoTestReport
+  - ./gradlew --console=plain jacocoFullTestReport
 
 after_success:
   - |
     if [[ $ABI =~ "arm" ]]; then
-      bash <(curl -s https://codecov.io/bash) -f ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+      bash <(curl -s https://codecov.io/bash) -f ./build/reports/jacoco/jacocoFullTestReport/jacocoFullTestReport.xml
     fi

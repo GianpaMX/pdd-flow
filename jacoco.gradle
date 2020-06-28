@@ -21,7 +21,7 @@ def setupKotlinReporting() {
         reports {
             csv.enabled false
             xml.enabled true
-            html.enabled false
+            html.enabled true
         }
     }
 }
