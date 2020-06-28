@@ -11,7 +11,8 @@ import io.github.gianpamx.pdd.MainActivity
         AppModule::class,
         FactoriesModule::class,
         BindingModule::class,
-        DomainModule::class
+        DomainModule::class,
+        ApiModule::class
     ]
 )
 interface AppComponent {

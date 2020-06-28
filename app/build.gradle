@@ -45,6 +45,8 @@ dependencies {
     implementation libraries.androidx.ktx
     implementation libraries.androidx.constraintLayout
 
+    implementation libraries.threetenabp
+
     kapt libraries.dagger.compiler
     implementation libraries.dagger.dagger
     implementation libraries.dagger.support
@@ -60,6 +62,10 @@ dependencies {
     implementation libraries.lifecycle.ktx
     implementation libraries.lifecycle.livedata
 
+    implementation libraries.room.runtime
+    kapt libraries.room.compiler
+    implementation libraries.room.ktx
+    androidTestImplementation libraries.room.testing
 
     testImplementation libraries.testing.junit
     testImplementation libraries.testing.assertj

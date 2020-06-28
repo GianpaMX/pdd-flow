@@ -16,14 +16,15 @@ ext {
     nav_version = '2.3.0-alpha04'
     mockito_version = '2.25.0'
     moshi_version = '1.9.2'
+    room_version = '2.2.5'
 
     libraries = [
-            kotlin    : [
+            kotlin     : [
                     kotlin : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version",
                     kotlinx: "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_version",
                     test   : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinx_version"
             ],
-            androidx  : [
+            androidx   : [
                     material        : 'com.google.android.material:material:1.1.0',
                     appcompat       : 'androidx.appcompat:appcompat:1.1.0',
                     cardview        : 'androidx.cardview:cardview:1.0.0',
@@ -33,47 +34,49 @@ ext {
                     fragmentktx     : 'androidx.fragment:fragment-ktx:1.3.0-alpha03',
                     testing         : 'androidx.arch.core:core-testing:2.0.1'
             ],
-            navigation: [
+            navigation : [
                     fragment: "androidx.navigation:navigation-fragment-ktx:$nav_version",
                     ui      : "androidx.navigation:navigation-ui-ktx:$nav_version",
                     testing : "androidx.navigation:navigation-testing:$nav_version"
             ],
-            dagger    : [
+            dagger     : [
                     compiler : "com.google.dagger:dagger-compiler:$dagger_version",
                     dagger   : "com.google.dagger:dagger:$dagger_version",
                     android  : "com.google.dagger:dagger-android:$dagger_version",
                     support  : "com.google.dagger:dagger-android-support:$dagger_version",
                     processor: "com.google.dagger:dagger-android-processor:$dagger_version"
             ],
-            lifecycle : [
+            lifecycle  : [
                     extensions: "androidx.lifecycle:lifecycle-extensions:$lifecycle_version",
                     compiler  : "androidx.lifecycle:lifecycle-compiler:$lifecycle_version",
                     testing   : "androidx.arch.core:core-testing:$lifecycle_version",
                     livedata  : "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version",
                     ktx       : "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
             ],
-            glide     : [
+            glide      : [
                     glide      : "com.github.bumptech.glide:glide:$glide_version",
                     compiler   : "com.github.bumptech.glide:compiler:$glide_version",
                     annotations: "com.github.bumptech.glide:annotations:$glide_version"
             ],
-            retrofit  : [
+            retrofit   : [
                     retrofit : "com.squareup.retrofit2:retrofit:$retrofit_version",
                     converter: "com.squareup.retrofit2:converter-moshi:$retrofit_version",
                     rx       : "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version",
                     logging  : 'com.squareup.okhttp3:logging-interceptor:4.4.1',
                     testing  : "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
             ],
-            moshi     : [
+            moshi      : [
                     moshi   : "com.squareup.moshi:moshi:$moshi_version",
                     compiler: "com.squareup.moshi:moshi-kotlin-codegen:$moshi_version"
             ],
-            rx        : [
-                    kotlin : 'io.reactivex.rxjava2:rxkotlin:2.4.0',
-                    java   : 'io.reactivex.rxjava2:rxjava:2.2.11',
-                    android: 'io.reactivex.rxjava2:rxandroid:2.1.1'
+            room       : [
+                    runtime : "androidx.room:room-runtime:$room_version",
+                    compiler: "androidx.room:room-compiler:$room_version",
+                    ktx     : "androidx.room:room-ktx:$room_version",
+                    testing : "androidx.room:room-testing:$room_version"
             ],
-            testing   : [
+            threetenabp: 'com.jakewharton.threetenabp:threetenabp:1.2.4',
+            testing    : [
                     junit          : 'junit:junit:4.13',
                     androidjunitx  : "androidx.test.ext:junit:$junitext_version",
                     androidjunitktx: "androidx.test.ext:junit-ktx:$junitext_version",
