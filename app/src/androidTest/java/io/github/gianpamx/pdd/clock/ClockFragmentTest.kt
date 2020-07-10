@@ -8,12 +8,13 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nhaarman.mockitokotlin2.whenever
 import io.github.gianpamx.pdd.R
 import io.github.gianpamx.pdd.app.ComponentApp
 import io.github.gianpamx.pdd.app.TestComponent
-import io.github.gianpamx.pdd.domain.ObserveState
-import io.github.gianpamx.pdd.domain.ObserveState.State
+import io.github.gianpamx.pdd.domain.api.MockTimeApi
+import io.github.gianpamx.pdd.domain.entity.State
+import io.github.gianpamx.pdd.dummyStateLog
+import io.github.gianpamx.pdd.room.MockTransitionDao
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Test
@@ -23,7 +24,10 @@ import javax.inject.Inject
 @RunWith(AndroidJUnit4::class)
 class ClockFragmentTest {
     @Inject
-    lateinit var observeStateMock: ObserveState
+    lateinit var transitionDao: MockTransitionDao
+
+    @Inject
+    lateinit var timeApi: MockTimeApi
 
     @Inject
     lateinit var fragmentFactory: FragmentFactory
@@ -37,11 +41,14 @@ class ClockFragmentTest {
         val testComponent = testApp.component as TestComponent
 
         testComponent.inject(this)
+
+        timeApi.time = 0
+        transitionDao.onLastStateLog = { null }
     }
 
     @Test
     fun idleState() {
-        whenever(observeStateMock.invoke()).thenReturn(flowOf(State.Idle))
+        transitionDao.onObserveStateLog = { flowOf(dummyStateLog(state = State.IDLE.name)) }
 
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 
@@ -50,7 +57,7 @@ class ClockFragmentTest {
 
     @Test
     fun pomodoroState() {
-        whenever(observeStateMock.invoke()).thenReturn(flowOf(State.Pomodoro(25)))
+        transitionDao.onObserveStateLog = { flowOf(dummyStateLog(state = State.POMODORO.name)) }
 
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 
@@ -59,7 +66,7 @@ class ClockFragmentTest {
 
     @Test
     fun doneState() {
-        whenever(observeStateMock.invoke()).thenReturn(flowOf(State.Done))
+        transitionDao.onObserveStateLog = { flowOf(dummyStateLog(state = State.DONE.name)) }
 
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 
@@ -68,7 +75,7 @@ class ClockFragmentTest {
 
     @Test
     fun breakState() {
-        whenever(observeStateMock.invoke()).thenReturn(flowOf(State.Break(5)))
+        transitionDao.onObserveStateLog = { flowOf(dummyStateLog(state = State.BREAK.name)) }
 
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 

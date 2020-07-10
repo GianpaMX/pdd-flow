@@ -9,6 +9,7 @@ import javax.inject.Singleton
         AppModule::class,
         FactoriesModule::class,
         BindingModule::class,
+        DomainModule::class,
         TestModule::class
     ]
 )

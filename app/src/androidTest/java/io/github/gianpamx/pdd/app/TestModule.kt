@@ -1,19 +1,33 @@
 package io.github.gianpamx.pdd.app
 
-import com.nhaarman.mockitokotlin2.mock
 import dagger.Module
 import dagger.Provides
-import io.github.gianpamx.pdd.domain.InitApp
-import io.github.gianpamx.pdd.domain.ObserveState
+import io.github.gianpamx.pdd.domain.api.MockTimeApi
+import io.github.gianpamx.pdd.domain.api.PersistenceApi
+import io.github.gianpamx.pdd.domain.api.TimeApi
+import io.github.gianpamx.pdd.room.MockTransitionDao
+import io.github.gianpamx.pdd.room.RoomPersistenceApi
+import io.github.gianpamx.pdd.room.TransitionDao
 import javax.inject.Singleton
 
 @Module
 class TestModule {
     @Provides
-    @Singleton
-    fun provideObserveState(): ObserveState = mock()
+    fun provideTimeApi(mockTimeApi: MockTimeApi): TimeApi = mockTimeApi
 
     @Provides
     @Singleton
-    fun provideInitApp(): InitApp = mock()
+    fun provideMockTimeApi() = MockTimeApi()
+
+    @Provides
+    fun providePersistenceApi(transitionDao: TransitionDao): PersistenceApi =
+        RoomPersistenceApi(transitionDao)
+
+    @Provides
+    fun provideTransitionDao(mockTransitionDao: MockTransitionDao): TransitionDao =
+        mockTransitionDao
+
+    @Provides
+    @Singleton
+    fun provideMockTransitionDao() = MockTransitionDao()
 }

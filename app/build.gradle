@@ -78,6 +78,4 @@ dependencies {
     androidTestImplementation libraries.testing.corektx
     androidTestImplementation libraries.testing.espresso
     debugImplementation libraries.testing.fragments
-    androidTestImplementation libraries.testing.mockitoKotlin2
-    androidTestImplementation libraries.testing.dexmaker
 }
