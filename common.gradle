@@ -76,6 +76,7 @@ ext {
                     testing : "androidx.room:room-testing:$room_version"
             ],
             threetenabp: 'com.jakewharton.threetenabp:threetenabp:1.2.4',
+            timber     : 'com.jakewharton.timber:timber:4.7.1',
             testing    : [
                     junit          : 'junit:junit:4.13',
                     androidjunitx  : "androidx.test.ext:junit:$junitext_version",

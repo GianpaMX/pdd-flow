@@ -5,6 +5,7 @@ import dagger.Provides
 import io.github.gianpamx.pdd.domain.InitApp
 import io.github.gianpamx.pdd.domain.NextState
 import io.github.gianpamx.pdd.domain.ObserveState
+import io.github.gianpamx.pdd.domain.StartPomodoro
 import io.github.gianpamx.pdd.domain.api.PersistenceApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
 
@@ -19,9 +20,15 @@ class DomainModule {
         persistenceApi: PersistenceApi,
         timeApi: TimeApi,
         nextState: NextState
-    ) =
-        InitApp(nextState, persistenceApi, timeApi)
+    ) = InitApp(nextState, persistenceApi, timeApi)
 
     @Provides
     fun provideNextState() = NextState()
+
+    @Provides
+    fun provideStartPomodoro(
+        persistenceApi: PersistenceApi,
+        timeApi: TimeApi,
+        nextState: NextState
+    ) = StartPomodoro(nextState, persistenceApi, timeApi)
 }

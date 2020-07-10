@@ -7,11 +7,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import io.github.gianpamx.pdd.R
 import io.github.gianpamx.pdd.clicks
 import kotlinx.android.synthetic.main.clock_fragment.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 import javax.inject.Inject
 
 private const val START_BUTTON = 0
@@ -30,6 +32,10 @@ class ClockFragment @Inject constructor(
             .onEach { viewModel.start() }
             .launchIn(lifecycleScope)
 
+        viewModel.errors
+            .onEach { view.show(it) }
+            .launchIn(lifecycleScope)
+
         viewModel.viewState.observe(viewLifecycleOwner, Observer {
             clockTextView.text = it.clock
             buttonFlipper.displayedChild = when (it) {
@@ -39,5 +45,14 @@ class ClockFragment @Inject constructor(
                 is ClockViewState.Done -> TAKE_BUTTON
             }
         })
+    }
+
+    private fun View.show(throwable: Throwable) {
+        Timber.e(throwable)
+        Snackbar
+            .make(this, R.string.error, Snackbar.LENGTH_INDEFINITE)
+            .apply {
+                setAction(R.string.dismiss) { dismiss() }
+            }.show()
     }
 }

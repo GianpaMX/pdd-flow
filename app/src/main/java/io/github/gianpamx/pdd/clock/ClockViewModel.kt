@@ -7,22 +7,38 @@ import androidx.lifecycle.viewModelScope
 import io.github.gianpamx.pdd.domain.ObserveState
 import io.github.gianpamx.pdd.domain.ObserveState.State
 import io.github.gianpamx.pdd.domain.ObserveState.State.Idle.time
+import io.github.gianpamx.pdd.domain.StartPomodoro
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ClockViewModel @Inject constructor(
     observeState: ObserveState,
-    defaultDispatcher: CoroutineDispatcher
+    private val startPomodoro: StartPomodoro,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
+    private val errorChannel = BroadcastChannel<Throwable>(Channel.CONFLATED)
+
+    val errors = errorChannel.asFlow()
+
     val viewState: LiveData<ClockViewState> = observeState()
         .map { it.toViewState() }
         .flowOn(defaultDispatcher)
         .asLiveData(viewModelScope.coroutineContext)
 
     fun start() {
-
+        viewModelScope.launch(defaultDispatcher) {
+            try {
+                startPomodoro()
+            } catch (t: Throwable) {
+                errorChannel.send(t)
+            }
+        }
     }
 
     private fun State.toViewState(): ClockViewState = when (this) {

@@ -46,6 +46,7 @@ dependencies {
     implementation libraries.androidx.constraintLayout
 
     implementation libraries.threetenabp
+    implementation libraries.timber
 
     kapt libraries.dagger.compiler
     implementation libraries.dagger.dagger

@@ -3,4 +3,7 @@
     <string name="clock_start_button">Start</string>
     <string name="clock_stop_button">Stop</string>
     <string name="clock_take_button">Take</string>
+
+    <string name="error">Error</string>
+    <string name="dismiss">Dismiss</string>
 </resources>
