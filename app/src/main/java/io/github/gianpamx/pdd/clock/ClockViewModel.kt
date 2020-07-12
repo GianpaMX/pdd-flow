@@ -42,6 +42,8 @@ class ClockViewModel @Inject constructor(
 
     private fun complete() = launchNextState(Action.COMPLETE)
 
+    fun take() = launchNextState(Action.TAKE)
+
     private fun launchNextState(action: Action) {
         viewModelScope.launch(defaultDispatcher) {
             try {

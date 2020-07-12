@@ -19,7 +19,8 @@ class NextState(
             currentState == State.IDLE && action == Action.START -> State.POMODORO
             currentState == State.POMODORO && action == Action.STOP -> State.IDLE
             currentState == State.POMODORO && action == Action.COMPLETE -> State.DONE
-            else -> throw IllegalActionException(action)
+            currentState == State.DONE && action == Action.TAKE -> State.BREAK
+            else -> throw IllegalActionException(currentState, action)
         }
 
         persistenceApi.newStateLog(timeApi.now(), nextState)
@@ -29,4 +30,5 @@ class NextState(
 }
 
 object IllegalNullStateException : IllegalStateException()
-class IllegalActionException(action: Action) : IllegalArgumentException(action.name)
+class IllegalActionException(state: State, action: Action) :
+    IllegalArgumentException("action ${action.name} on ${state.name} state")

@@ -67,4 +67,13 @@ class NextStateTest {
 
         assertThat(state).isEqualTo(State.DONE)
     }
+
+    @Test
+    fun `Take Break`() = runBlockingTest {
+        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.DONE))
+
+        val state = nextState.invoke(Action.TAKE)
+
+        assertThat(state).isEqualTo(State.BREAK)
+    }
 }

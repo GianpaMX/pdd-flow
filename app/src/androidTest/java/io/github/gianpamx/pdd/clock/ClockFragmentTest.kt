@@ -81,22 +81,12 @@ class ClockFragmentTest {
     }
 
     @Test
-    fun doneState() {
+    fun takeBreak() {
         stateLogDao.insertBlocking(dummyStateLog(state = State.DONE.name))
-        sleep(1_000)
-
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
-
-        sleep(1_000)
-        onView(withId(R.id.takeButton)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun breakState() {
-        stateLogDao.insertBlocking(dummyStateLog(state = State.BREAK.name))
         sleep(1_000)
 
-        launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
+        onView(withId(R.id.takeButton)).perform(click())
 
         sleep(1_000)
         onView(withId(R.id.startButton)).check(matches(isDisplayed()))

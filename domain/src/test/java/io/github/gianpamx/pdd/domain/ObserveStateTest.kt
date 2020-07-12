@@ -14,6 +14,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 
+private const val POMODORO_LENGTH = 25 * 60
+private const val BREAK_LENGTH = 5 * 60
+
 @ExperimentalCoroutinesApi
 class ObserveStateTest {
     private val persistenceApi: PersistenceApi = mock()
@@ -42,7 +45,7 @@ class ObserveStateTest {
 
         val result = observeState.invoke().toList()
 
-        assertThat(result).isEqualTo(listOf(ObserveState.State.Pomodoro(25 * 60)))
+        assertThat(result).isEqualTo(listOf(ObserveState.State.Pomodoro(POMODORO_LENGTH)))
     }
 
     @Test
@@ -60,6 +63,6 @@ class ObserveStateTest {
 
         val result = observeState.invoke().toList()
 
-        assertThat(result).isEqualTo(listOf(ObserveState.State.Break(5 * 60)))
+        assertThat(result).isEqualTo(listOf(ObserveState.State.Break(BREAK_LENGTH)))
     }
 }

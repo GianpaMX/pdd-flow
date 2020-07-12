@@ -10,13 +10,16 @@ import io.github.gianpamx.pdd.domain.entity.Transition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
+private const val POMODORO_LENGTH = 25 * 60
+private const val BREAK_LENGTH = 5 * 60
+
 class ObserveState(
     private val persistenceApi: PersistenceApi,
     private val timeApi: TimeApi
 ) {
     sealed class State {
         object Idle : State() {
-            const val time: Int = 25 * 60
+            const val time: Int = POMODORO_LENGTH
         }
 
         data class Pomodoro(val time: Int) : State()
@@ -32,8 +35,8 @@ class ObserveState(
 
     private fun Transition.toState(now: Int) = when (state) {
         IDLE -> State.Idle
-        POMODORO -> State.Pomodoro(timestamp + 25 * 60 - now)
+        POMODORO -> State.Pomodoro(timestamp + POMODORO_LENGTH - now)
         DONE -> State.Done
-        BREAK -> State.Break(timestamp + 5 * 60 - now)
+        BREAK -> State.Break(timestamp + BREAK_LENGTH - now)
     }
 }

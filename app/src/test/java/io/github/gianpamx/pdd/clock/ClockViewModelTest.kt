@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
@@ -34,6 +35,13 @@ class ClockViewModelTest {
 
     @get:Rule
     val rule: TestRule = InstantTaskExecutorRule()
+
+    lateinit var viewModel: ClockViewModel
+
+    @Before
+    fun setUp() {
+        viewModel = ClockViewModel(observeState, nextState, coroutineRule.testDispatcher)
+    }
 
     @Test
     fun `Idle state`() = coroutineRule.testDispatcher.runBlockingTest {
@@ -115,7 +123,6 @@ class ClockViewModelTest {
     @Test
     fun `Start pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Idle))
-        val viewModel = ClockViewModel(observeState, nextState, coroutineRule.testDispatcher)
 
         viewModel.start()
 
@@ -126,7 +133,6 @@ class ClockViewModelTest {
     @InternalCoroutinesApi
     fun `Failure tu start a pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(nextState.invoke(any())).thenAnswer { throw Throwable() }
-        val viewModel = ClockViewModel(observeState, nextState, coroutineRule.testDispatcher)
         val testCollector = TestCollector<Throwable>()
         val job = testCollector.test(this, viewModel.errors)
 
@@ -139,7 +145,6 @@ class ClockViewModelTest {
     @Test
     fun `Stop pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Pomodoro(0)))
-        val viewModel = ClockViewModel(observeState, nextState, coroutineRule.testDispatcher)
 
         viewModel.stop()
 
@@ -157,5 +162,14 @@ class ClockViewModelTest {
         }
 
         verify(nextState).invoke(Action.COMPLETE)
+    }
+
+    @Test
+    fun `Take break`() = coroutineRule.testDispatcher.runBlockingTest {
+        whenever(observeState.invoke()).thenReturn(flowOf(State.Done))
+
+        viewModel.take()
+
+        verify(nextState).invoke(Action.TAKE)
     }
 }
