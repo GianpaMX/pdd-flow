@@ -1,35 +1,62 @@
 package io.github.gianpamx.pdd.domain
 
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
+import io.github.gianpamx.pdd.domain.api.PersistenceApi
+import io.github.gianpamx.pdd.domain.api.TimeApi
 import io.github.gianpamx.pdd.domain.entity.Action
 import io.github.gianpamx.pdd.domain.entity.State
+import io.github.gianpamx.pdd.dummyTransition
+import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.Test
 
 class NextStateTest {
-    @Test
-    fun `Initial State`() {
-        val nextState = NextState()
+    private val persistenceApi: PersistenceApi = mock()
+    private val timeApi: TimeApi = mock()
 
-        val result = nextState.invoke(null, null)
+    private lateinit var nextState: NextState
 
-        assertThat(result).isEqualTo(State.IDLE)
+    @Before
+    fun setUp() {
+        nextState = NextState(persistenceApi, timeApi)
+    }
+
+    @Test(expected = IllegalNullStateException::class)
+    fun `Init App should have been executed before`() = runBlockingTest {
+        whenever(persistenceApi.getLastStateLog()).thenReturn(null)
+
+        nextState.invoke(Action.START)
+
+        // assert IllegalNullStateException
+    }
+
+    @Test(expected = IllegalActionException::class)
+    fun `Invalid Stop on Idle State`() = runBlockingTest {
+        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.IDLE))
+
+        nextState.invoke(Action.STOP)
+
+        // assert IllegalActionException
     }
 
     @Test
-    fun `Start from Idle to Pomodoro`() {
-        val nextState = NextState()
+    fun `Start Pomodoro`() = runBlockingTest {
+        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.IDLE))
 
-        val result = nextState.invoke(State.IDLE, Action.START)
+        val state = nextState.invoke(Action.START)
 
-        assertThat(result).isEqualTo(State.POMODORO)
+        assertThat(state).isEqualTo(State.POMODORO)
     }
 
     @Test
-    fun `Stop from Pomodoro to Idle`() {
-        val nextState = NextState()
+    fun `Stop Pomodoro`() = runBlockingTest {
+        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.POMODORO))
+        val nextState = NextState(persistenceApi, timeApi)
 
-        val result = nextState.invoke(State.POMODORO, Action.STOP)
+        val state = nextState.invoke(Action.STOP)
 
-        assertThat(result).isEqualTo(State.IDLE)
+        assertThat(state).isEqualTo(State.IDLE)
     }
 }

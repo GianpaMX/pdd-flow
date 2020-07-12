@@ -60,6 +60,7 @@ class ClockFragmentTest {
     fun startPomodoro() {
         stateLogDao.insertBlocking(dummyStateLog(state = State.IDLE.name))
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
+        sleep(1_000)
 
         onView(withId(R.id.startButton)).perform(click())
 
@@ -71,6 +72,7 @@ class ClockFragmentTest {
     fun stopPomodoro() {
         stateLogDao.insertBlocking(dummyStateLog(state = State.POMODORO.name))
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
+        sleep(1_000)
 
         onView(withId(R.id.stopButton)).perform(click())
 
@@ -81,6 +83,7 @@ class ClockFragmentTest {
     @Test
     fun doneState() {
         stateLogDao.insertBlocking(dummyStateLog(state = State.DONE.name))
+        sleep(1_000)
 
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 
@@ -91,6 +94,7 @@ class ClockFragmentTest {
     @Test
     fun breakState() {
         stateLogDao.insertBlocking(dummyStateLog(state = State.BREAK.name))
+        sleep(1_000)
 
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 

@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import io.github.gianpamx.pdd.domain.NextState
 import io.github.gianpamx.pdd.domain.ObserveState
 import io.github.gianpamx.pdd.domain.ObserveState.State
 import io.github.gianpamx.pdd.domain.ObserveState.State.Idle.time
-import io.github.gianpamx.pdd.domain.StartPomodoro
-import io.github.gianpamx.pdd.domain.StopPomodoro
+import io.github.gianpamx.pdd.domain.entity.Action
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
@@ -20,8 +20,7 @@ import javax.inject.Inject
 
 class ClockViewModel @Inject constructor(
     observeState: ObserveState,
-    private val startPomodoro: StartPomodoro,
-    private val stopPomodoro: StopPomodoro,
+    private val nextState: NextState,
     private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val errorChannel = BroadcastChannel<Throwable>(Channel.CONFLATED)
@@ -36,7 +35,7 @@ class ClockViewModel @Inject constructor(
     fun start() {
         viewModelScope.launch(defaultDispatcher) {
             try {
-                startPomodoro()
+                nextState(Action.START)
             } catch (t: Throwable) {
                 errorChannel.send(t)
             }
@@ -46,7 +45,7 @@ class ClockViewModel @Inject constructor(
     fun stop() {
         viewModelScope.launch(defaultDispatcher) {
             try {
-                stopPomodoro()
+                nextState(Action.STOP)
             } catch (t: Throwable) {
                 errorChannel.send(t)
             }
