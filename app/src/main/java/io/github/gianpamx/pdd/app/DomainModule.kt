@@ -12,10 +12,12 @@ import io.github.gianpamx.pdd.domain.api.TimeApi
 @Module
 class DomainModule {
     @Provides
+    @AppScope
     fun provideObserveState(persistenceApi: PersistenceApi, timeApi: TimeApi) =
         ObserveState(persistenceApi, timeApi)
 
     @Provides
+    @AppScope
     fun provideInitApp(
         persistenceApi: PersistenceApi,
         timeApi: TimeApi,
@@ -23,9 +25,11 @@ class DomainModule {
     ) = InitApp(nextState, persistenceApi, timeApi)
 
     @Provides
+    @AppScope
     fun provideNextState() = NextState()
 
     @Provides
+    @AppScope
     fun provideStartPomodoro(
         persistenceApi: PersistenceApi,
         timeApi: TimeApi,

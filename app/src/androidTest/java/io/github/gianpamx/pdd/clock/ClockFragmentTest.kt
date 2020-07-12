@@ -3,6 +3,7 @@ package io.github.gianpamx.pdd.clock
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -14,8 +15,7 @@ import io.github.gianpamx.pdd.app.TestComponent
 import io.github.gianpamx.pdd.domain.api.MockTimeApi
 import io.github.gianpamx.pdd.domain.entity.State
 import io.github.gianpamx.pdd.dummyStateLog
-import io.github.gianpamx.pdd.room.MockTransitionDao
-import kotlinx.coroutines.flow.flowOf
+import io.github.gianpamx.pdd.room.StateLogDao
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @RunWith(AndroidJUnit4::class)
 class ClockFragmentTest {
     @Inject
-    lateinit var transitionDao: MockTransitionDao
+    lateinit var stateLogDao: StateLogDao
 
     @Inject
     lateinit var timeApi: MockTimeApi
@@ -43,21 +43,22 @@ class ClockFragmentTest {
         testComponent.inject(this)
 
         timeApi.time = 0
-        transitionDao.onLastStateLog = { null }
     }
 
-    @Test
-    fun idleState() {
-        transitionDao.onObserveStateLog = { flowOf(dummyStateLog(state = State.IDLE.name)) }
 
+    @Test
+    fun startPomodoro() {
+        stateLogDao.insertBlocking(dummyStateLog(state = State.IDLE.name))
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 
-        onView(withId(R.id.startButton)).check(matches(isDisplayed()))
+        onView(withId(R.id.startButton)).perform(click())
+
+        onView(withId(R.id.stopButton)).check(matches(isDisplayed()))
     }
 
     @Test
     fun pomodoroState() {
-        transitionDao.onObserveStateLog = { flowOf(dummyStateLog(state = State.POMODORO.name)) }
+        stateLogDao.insertBlocking(dummyStateLog(state = State.POMODORO.name))
 
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 
@@ -66,7 +67,7 @@ class ClockFragmentTest {
 
     @Test
     fun doneState() {
-        transitionDao.onObserveStateLog = { flowOf(dummyStateLog(state = State.DONE.name)) }
+        stateLogDao.insertBlocking(dummyStateLog(state = State.DONE.name))
 
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 
@@ -75,7 +76,7 @@ class ClockFragmentTest {
 
     @Test
     fun breakState() {
-        transitionDao.onObserveStateLog = { flowOf(dummyStateLog(state = State.BREAK.name)) }
+        stateLogDao.insertBlocking(dummyStateLog(state = State.BREAK.name))
 
         launchFragmentInContainer<ClockFragment>(factory = fragmentFactory)
 

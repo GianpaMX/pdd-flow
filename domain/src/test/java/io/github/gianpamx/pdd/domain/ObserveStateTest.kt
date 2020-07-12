@@ -23,6 +23,7 @@ class ObserveStateTest {
 
     @Before
     fun setUp() {
+        whenever(timeApi.ticker()).thenReturn(flowOf(0))
         observeState = ObserveState(persistenceApi, timeApi)
     }
 
@@ -38,11 +39,10 @@ class ObserveStateTest {
     @Test
     fun `Pomodoro State`() = runBlockingTest {
         whenever(persistenceApi.observeStateLog()).thenReturn(flowOf(Transition(State.POMODORO, 0)))
-        whenever(timeApi.now()).thenReturn(0)
 
         val result = observeState.invoke().toList()
 
-        assertThat(result).isEqualTo(listOf(ObserveState.State.Pomodoro(0)))
+        assertThat(result).isEqualTo(listOf(ObserveState.State.Pomodoro(25 * 60)))
     }
 
     @Test
@@ -57,10 +57,9 @@ class ObserveStateTest {
     @Test
     fun `Break State`() = runBlockingTest {
         whenever(persistenceApi.observeStateLog()).thenReturn(flowOf(Transition(State.BREAK, 0)))
-        whenever(timeApi.now()).thenReturn(0)
 
         val result = observeState.invoke().toList()
 
-        assertThat(result).isEqualTo(listOf(ObserveState.State.Break(0)))
+        assertThat(result).isEqualTo(listOf(ObserveState.State.Break(5 * 60)))
     }
 }

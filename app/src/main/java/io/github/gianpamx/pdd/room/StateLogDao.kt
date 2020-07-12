@@ -7,13 +7,16 @@ import io.github.gianpamx.pdd.room.entity.StateLog
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface TransitionDao {
+interface StateLogDao {
     @Query("SELECT * FROM StateLog ORDER BY id DESC LIMIT 1")
-    fun observeStateLog(): Flow<StateLog?>
+    fun observeLast(): Flow<StateLog?>
 
     @Query("SELECT * FROM StateLog ORDER BY id DESC LIMIT 1")
-    suspend fun lastStateLog(): StateLog?
+    suspend fun last(): StateLog?
 
     @Insert
-    fun insertStateLog(stateLog: StateLog)
+    suspend fun insert(stateLog: StateLog)
+
+    @Insert
+    fun insertBlocking(stateLog: StateLog)
 }

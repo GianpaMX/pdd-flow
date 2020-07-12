@@ -1,8 +1,9 @@
 package io.github.gianpamx.pdd.app
 
+import android.app.Application
+import dagger.BindsInstance
 import dagger.Component
 import io.github.gianpamx.pdd.clock.ClockFragmentTest
-import javax.inject.Singleton
 
 @Component(
     modules = [
@@ -13,7 +14,15 @@ import javax.inject.Singleton
         TestModule::class
     ]
 )
-@Singleton
+@AppScope
 interface TestComponent : AppComponent {
-    fun inject(clockFragmentTest: ClockFragmentTest)
+    fun inject(clockFragmentStatesTest: ClockFragmentTest)
+
+    @Component.Builder
+    interface Builder {
+        @BindsInstance
+        fun application(testApp: TestApp): Builder
+
+        fun build(): TestComponent
+    }
 }

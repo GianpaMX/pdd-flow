@@ -8,7 +8,7 @@ import io.github.gianpamx.pdd.domain.entity.State.IDLE
 import io.github.gianpamx.pdd.domain.entity.State.POMODORO
 import io.github.gianpamx.pdd.domain.entity.Transition
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 
 class ObserveState(
     private val persistenceApi: PersistenceApi,
@@ -24,12 +24,16 @@ class ObserveState(
         data class Break(val time: Int) : State()
     }
 
-    operator fun invoke(): Flow<State> = persistenceApi.observeStateLog().map { it.toState() }
+    operator fun invoke(): Flow<State> = timeApi
+        .ticker()
+        .combine(persistenceApi.observeStateLog()) { now, transition ->
+            transition.toState(now)
+        }
 
-    private fun Transition.toState() = when (state) {
+    private fun Transition.toState(now: Int) = when (state) {
         IDLE -> State.Idle
-        POMODORO -> State.Pomodoro(timeApi.now() - timestamp)
+        POMODORO -> State.Pomodoro(timestamp + 25 * 60 - now)
         DONE -> State.Done
-        BREAK -> State.Break(timeApi.now() - timestamp)
+        BREAK -> State.Break(timestamp + 5 * 60 - now)
     }
 }

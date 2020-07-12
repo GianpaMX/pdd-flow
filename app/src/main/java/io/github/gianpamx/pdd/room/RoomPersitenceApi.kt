@@ -8,16 +8,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
-class RoomPersistenceApi(private val transitionDao: TransitionDao) : PersistenceApi {
-    override fun observeStateLog(): Flow<Transition> = transitionDao
-        .observeStateLog()
+class RoomPersistenceApi(private val stateLogDao: StateLogDao) : PersistenceApi {
+    override fun observeStateLog(): Flow<Transition> = stateLogDao
+        .observeLast()
         .map { it?.toTransition() }
         .filterNotNull()
 
-    override suspend fun getLastStateLog() = transitionDao.lastStateLog()?.toTransition()
+    override suspend fun getLastStateLog() = stateLogDao.last()?.toTransition()
 
     override suspend fun newStateLog(timestamp: Int, state: State) {
-        transitionDao.insertStateLog(StateLog(0, timestamp, state.name))
+        stateLogDao.insert(StateLog(0L, timestamp, state.name))
     }
 
     private fun StateLog.toTransition() = Transition(
