@@ -35,8 +35,10 @@ class TestModule {
     @AppScope
     fun provideStateLogDao(appDatabase: AppDatabase) = appDatabase.stateLogDao()
 
+    /**
+     * New instance for every test
+     */
     @Provides
-    @AppScope
     fun provideAppDatabase(applicationContext: Context) =
         Room.inMemoryDatabaseBuilder(applicationContext, AppDatabase::class.java)
             .fallbackToDestructiveMigration()

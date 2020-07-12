@@ -8,6 +8,7 @@ import io.github.gianpamx.pdd.domain.ObserveState
 import io.github.gianpamx.pdd.domain.ObserveState.State
 import io.github.gianpamx.pdd.domain.ObserveState.State.Idle.time
 import io.github.gianpamx.pdd.domain.StartPomodoro
+import io.github.gianpamx.pdd.domain.StopPomodoro
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class ClockViewModel @Inject constructor(
     observeState: ObserveState,
     private val startPomodoro: StartPomodoro,
+    private val stopPomodoro: StopPomodoro,
     private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val errorChannel = BroadcastChannel<Throwable>(Channel.CONFLATED)
@@ -35,6 +37,16 @@ class ClockViewModel @Inject constructor(
         viewModelScope.launch(defaultDispatcher) {
             try {
                 startPomodoro()
+            } catch (t: Throwable) {
+                errorChannel.send(t)
+            }
+        }
+    }
+
+    fun stop() {
+        viewModelScope.launch(defaultDispatcher) {
+            try {
+                stopPomodoro()
             } catch (t: Throwable) {
                 errorChannel.send(t)
             }

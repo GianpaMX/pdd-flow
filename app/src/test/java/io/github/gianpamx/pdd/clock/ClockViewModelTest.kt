@@ -10,6 +10,7 @@ import io.github.gianpamx.observeForTesting
 import io.github.gianpamx.pdd.domain.ObserveState
 import io.github.gianpamx.pdd.domain.ObserveState.State
 import io.github.gianpamx.pdd.domain.StartPomodoro
+import io.github.gianpamx.pdd.domain.StopPomodoro
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -25,6 +26,8 @@ class ClockViewModelTest {
 
     private val startPomodoro: StartPomodoro = mock()
 
+    private val stopPomodoro: StopPomodoro = mock()
+
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
@@ -35,7 +38,7 @@ class ClockViewModelTest {
     fun `Idle state`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Idle))
 
-        val viewModel = ClockViewModel(observeState, startPomodoro, coroutineRule.testDispatcher)
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
             assertThat(viewModel.viewState.value).isInstanceOf(ClockViewState.Idle::class.java)
@@ -46,7 +49,7 @@ class ClockViewModelTest {
     fun `Pomodoro state`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Pomodoro(0)))
 
-        val viewModel = ClockViewModel(observeState, startPomodoro, coroutineRule.testDispatcher)
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
             assertThat(viewModel.viewState.value).isInstanceOf(ClockViewState.Pomodoro::class.java)
@@ -57,7 +60,7 @@ class ClockViewModelTest {
     fun `Done state`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Done))
 
-        val viewModel = ClockViewModel(observeState, startPomodoro, coroutineRule.testDispatcher)
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
             assertThat(viewModel.viewState.value).isInstanceOf(ClockViewState.Done::class.java)
@@ -68,7 +71,7 @@ class ClockViewModelTest {
     fun `Break state`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Break(0)))
 
-        val viewModel = ClockViewModel(observeState, startPomodoro, coroutineRule.testDispatcher)
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
             assertThat(viewModel.viewState.value).isInstanceOf(ClockViewState.Break::class.java)
@@ -79,7 +82,7 @@ class ClockViewModelTest {
     fun `0 seconds clock`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Pomodoro(0)))
 
-        val viewModel = ClockViewModel(observeState, startPomodoro, coroutineRule.testDispatcher)
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
             assertThat(viewModel.viewState.value?.clock).isEqualTo("0:00")
@@ -90,7 +93,7 @@ class ClockViewModelTest {
     fun `60 seconds clock`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Pomodoro(60)))
 
-        val viewModel = ClockViewModel(observeState, startPomodoro, coroutineRule.testDispatcher)
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
             assertThat(viewModel.viewState.value?.clock).isEqualTo("1:00")
@@ -101,7 +104,7 @@ class ClockViewModelTest {
     fun `25 minutes clock`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Pomodoro(25 * 60)))
 
-        val viewModel = ClockViewModel(observeState, startPomodoro, coroutineRule.testDispatcher)
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
             assertThat(viewModel.viewState.value?.clock).isEqualTo("25:00")
@@ -111,7 +114,7 @@ class ClockViewModelTest {
     @Test
     fun `Start pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Idle))
-        val viewModel = ClockViewModel(observeState, startPomodoro, coroutineRule.testDispatcher)
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
 
         viewModel.start()
 
@@ -122,7 +125,7 @@ class ClockViewModelTest {
     @InternalCoroutinesApi
     fun `Failure tu start a pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(startPomodoro.invoke()).thenAnswer { throw Throwable() }
-        val viewModel = ClockViewModel(observeState, startPomodoro, coroutineRule.testDispatcher)
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
         val testCollector = TestCollector<Throwable>()
         val job = testCollector.test(this, viewModel.errors)
 
@@ -131,6 +134,14 @@ class ClockViewModelTest {
         assertThat(testCollector.values.last()).isInstanceOf(Throwable::class.java)
         job.cancel()
     }
+
+    @Test
+    fun `Stop pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
+        whenever(observeState.invoke()).thenReturn(flowOf(State.Pomodoro(0)))
+        val viewModel = ClockViewModel(observeState, startPomodoro, stopPomodoro, coroutineRule.testDispatcher)
+
+        viewModel.stop()
+
+        verify(stopPomodoro).invoke()
+    }
 }
-
-

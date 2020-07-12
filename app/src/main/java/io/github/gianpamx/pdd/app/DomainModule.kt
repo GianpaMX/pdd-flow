@@ -6,6 +6,7 @@ import io.github.gianpamx.pdd.domain.InitApp
 import io.github.gianpamx.pdd.domain.NextState
 import io.github.gianpamx.pdd.domain.ObserveState
 import io.github.gianpamx.pdd.domain.StartPomodoro
+import io.github.gianpamx.pdd.domain.StopPomodoro
 import io.github.gianpamx.pdd.domain.api.PersistenceApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
 
@@ -35,4 +36,12 @@ class DomainModule {
         timeApi: TimeApi,
         nextState: NextState
     ) = StartPomodoro(nextState, persistenceApi, timeApi)
+
+    @Provides
+    @AppScope
+    fun provideStopPomodoro(
+        persistenceApi: PersistenceApi,
+        timeApi: TimeApi,
+        nextState: NextState
+    ) = StopPomodoro(nextState, persistenceApi, timeApi)
 }

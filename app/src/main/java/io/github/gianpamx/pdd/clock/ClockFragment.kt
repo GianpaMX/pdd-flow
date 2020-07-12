@@ -32,6 +32,10 @@ class ClockFragment @Inject constructor(
             .onEach { viewModel.start() }
             .launchIn(lifecycleScope)
 
+        stopButton.clicks()
+            .onEach { viewModel.stop() }
+            .launchIn(lifecycleScope)
+
         viewModel.errors
             .onEach { view.show(it) }
             .launchIn(lifecycleScope)

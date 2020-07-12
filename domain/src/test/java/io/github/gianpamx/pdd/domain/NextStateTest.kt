@@ -23,4 +23,13 @@ class NextStateTest {
 
         assertThat(result).isEqualTo(State.POMODORO)
     }
+
+    @Test
+    fun `Stop from Pomodoro to Idle`() {
+        val nextState = NextState()
+
+        val result = nextState.invoke(State.POMODORO, Action.STOP)
+
+        assertThat(result).isEqualTo(State.IDLE)
+    }
 }
