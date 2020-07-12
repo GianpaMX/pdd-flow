@@ -53,10 +53,18 @@ class NextStateTest {
     @Test
     fun `Stop Pomodoro`() = runBlockingTest {
         whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.POMODORO))
-        val nextState = NextState(persistenceApi, timeApi)
 
         val state = nextState.invoke(Action.STOP)
 
         assertThat(state).isEqualTo(State.IDLE)
+    }
+
+    @Test
+    fun `Complete Pomodoro`() = runBlockingTest {
+        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.POMODORO))
+
+        val state = nextState.invoke(Action.COMPLETE)
+
+        assertThat(state).isEqualTo(State.DONE)
     }
 }

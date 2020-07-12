@@ -15,6 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,24 +29,23 @@ class ClockViewModel @Inject constructor(
     val errors = errorChannel.asFlow()
 
     val viewState: LiveData<ClockViewState> = observeState()
+        .onEach {
+            if (it is State.Pomodoro && it.hasTimeUp()) complete()
+        }
         .map { it.toViewState() }
         .flowOn(defaultDispatcher)
         .asLiveData(viewModelScope.coroutineContext)
 
-    fun start() {
-        viewModelScope.launch(defaultDispatcher) {
-            try {
-                nextState(Action.START)
-            } catch (t: Throwable) {
-                errorChannel.send(t)
-            }
-        }
-    }
+    fun start() = launchNextState(Action.START)
 
-    fun stop() {
+    fun stop() = launchNextState(Action.STOP)
+
+    private fun complete() = launchNextState(Action.COMPLETE)
+
+    private fun launchNextState(action: Action) {
         viewModelScope.launch(defaultDispatcher) {
             try {
-                nextState(Action.STOP)
+                nextState(action)
             } catch (t: Throwable) {
                 errorChannel.send(t)
             }
@@ -62,4 +62,6 @@ class ClockViewModel @Inject constructor(
     private fun Int.toClock() = "${minutes()}:${seconds()}"
     private fun Int.minutes() = this / 60
     private fun Int.seconds() = "${this % 60}".padStart(2, '0')
+
+    private fun State.Pomodoro.hasTimeUp() = time == 0
 }

@@ -18,6 +18,7 @@ class NextState(
         val nextState = when {
             currentState == State.IDLE && action == Action.START -> State.POMODORO
             currentState == State.POMODORO && action == Action.STOP -> State.IDLE
+            currentState == State.POMODORO && action == Action.COMPLETE -> State.DONE
             else -> throw IllegalActionException(action)
         }
 

@@ -14,7 +14,9 @@ import io.github.gianpamx.pdd.domain.ObserveState.State
 import io.github.gianpamx.pdd.domain.entity.Action
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
@@ -142,5 +144,18 @@ class ClockViewModelTest {
         viewModel.stop()
 
         verify(nextState).invoke(Action.STOP)
+    }
+
+    @Test
+    fun `Complete pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
+        whenever(observeState.invoke())
+            .thenReturn((25 * 60 downTo 0).asFlow().map { State.Pomodoro(it) })
+        val viewModel = ClockViewModel(observeState, nextState, coroutineRule.testDispatcher)
+
+        viewModel.viewState.observeForTesting {
+            assertThat(viewModel.viewState.value).isInstanceOf(ClockViewState.Pomodoro::class.java)
+        }
+
+        verify(nextState).invoke(Action.COMPLETE)
     }
 }
