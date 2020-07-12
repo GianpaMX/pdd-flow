@@ -76,4 +76,13 @@ class NextStateTest {
 
         assertThat(state).isEqualTo(State.BREAK)
     }
+
+    @Test
+    fun `Start Pomodoro from Break`() = runBlockingTest {
+        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.BREAK))
+
+        val state = nextState.invoke(Action.START)
+
+        assertThat(state).isEqualTo(State.POMODORO)
+    }
 }

@@ -20,6 +20,7 @@ class NextState(
             currentState == State.POMODORO && action == Action.STOP -> State.IDLE
             currentState == State.POMODORO && action == Action.COMPLETE -> State.DONE
             currentState == State.DONE && action == Action.TAKE -> State.BREAK
+            currentState == State.BREAK && action == Action.START -> State.POMODORO
             else -> throw IllegalActionException(currentState, action)
         }
 

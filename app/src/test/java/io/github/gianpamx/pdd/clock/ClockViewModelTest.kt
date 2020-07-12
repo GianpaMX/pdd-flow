@@ -24,6 +24,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 
+private const val POMODORO_LENGTH = 25 * 60
+private const val BREAK_LENGTH = 5 * 60
+
 @ExperimentalCoroutinesApi
 class ClockViewModelTest {
     private val observeState: ObserveState = mock()
@@ -111,7 +114,7 @@ class ClockViewModelTest {
 
     @Test
     fun `25 minutes clock`() = coroutineRule.testDispatcher.runBlockingTest {
-        whenever(observeState.invoke()).thenReturn(flowOf(State.Pomodoro(25 * 60)))
+        whenever(observeState.invoke()).thenReturn(flowOf(State.Pomodoro(POMODORO_LENGTH)))
 
         val viewModel = ClockViewModel(observeState, nextState, coroutineRule.testDispatcher)
 
@@ -154,7 +157,7 @@ class ClockViewModelTest {
     @Test
     fun `Complete pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke())
-            .thenReturn((25 * 60 downTo 0).asFlow().map { State.Pomodoro(it) })
+            .thenReturn((POMODORO_LENGTH downTo 0).asFlow().map { State.Pomodoro(it) })
         val viewModel = ClockViewModel(observeState, nextState, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
