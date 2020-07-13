@@ -30,7 +30,9 @@ class ClockViewModel @Inject constructor(
 
     val viewState: LiveData<ClockViewState> = observeState()
         .onEach {
-            if (it is State.Pomodoro && it.hasTimeUp()) complete()
+            when (it) {
+                is State.Pomodoro, is State.Break -> it.hasTimeUp { complete() }
+            }
         }
         .map { it.toViewState() }
         .flowOn(defaultDispatcher)
@@ -65,5 +67,10 @@ class ClockViewModel @Inject constructor(
     private fun Int.minutes() = this / 60
     private fun Int.seconds() = "${this % 60}".padStart(2, '0')
 
-    private fun State.Pomodoro.hasTimeUp() = time == 0
+    private fun State.hasTimeUp(block: () -> Unit) {
+        when (this) {
+            is State.Pomodoro -> if (this.time == 0) block.invoke()
+            is State.Break -> if (this.time == 0) block.invoke()
+        }
+    }
 }

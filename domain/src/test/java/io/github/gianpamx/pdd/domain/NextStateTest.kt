@@ -85,4 +85,13 @@ class NextStateTest {
 
         assertThat(state).isEqualTo(State.POMODORO)
     }
+
+    @Test
+    fun `Complete Break`() = runBlockingTest {
+        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.BREAK))
+
+        val state = nextState.invoke(Action.COMPLETE)
+
+        assertThat(state).isEqualTo(State.IDLE)
+    }
 }
