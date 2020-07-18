@@ -1,52 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/clockTextView"
+    <TextView
+        android:id="@+id/clockTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        tools:text="25:00" />
+
+    <io.github.gianpamx.pdd.view.FabFlipper
+        android:id="@+id/buttonFlipper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:clipToPadding="false"
+        android:padding="16dp">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/startButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="25:00" />
+            android:contentDescription="@string/clock_start_button"
+            android:src="@drawable/ic_baseline_play_arrow_24" />
 
-        <ViewFlipper
-            android:id="@+id/buttonFlipper"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/stopButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/clockTextView">
+            android:contentDescription="@string/clock_stop_button"
+            android:src="@drawable/ic_baseline_stop_24" />
 
-            <Button
-                android:id="@+id/startButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/clock_start_button" />
-
-            <Button
-                android:id="@+id/stopButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/clock_stop_button" />
-
-            <Button
-                android:id="@+id/takeButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/clock_take_button" />
-        </ViewFlipper>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/takeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/clock_take_button"
+            android:src="@drawable/ic_baseline_check_24" />
+    </io.github.gianpamx.pdd.view.FabFlipper>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
