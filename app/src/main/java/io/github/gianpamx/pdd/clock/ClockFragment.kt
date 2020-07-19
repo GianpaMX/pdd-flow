@@ -1,8 +1,10 @@
 package io.github.gianpamx.pdd.clock
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -10,6 +12,13 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import io.github.gianpamx.pdd.R
 import io.github.gianpamx.pdd.clicks
+import io.github.gianpamx.pdd.clock.ClockViewState.Break
+import io.github.gianpamx.pdd.clock.ClockViewState.Pomodoro
+import io.github.gianpamx.pdd.notification.NOTIFICATION_SERVICE_COMMAND
+import io.github.gianpamx.pdd.notification.NotificationCommand
+import io.github.gianpamx.pdd.notification.NotificationCommand.HIDE
+import io.github.gianpamx.pdd.notification.NotificationCommand.SHOW
+import io.github.gianpamx.pdd.notification.NotificationService
 import kotlinx.android.synthetic.main.clock_fragment.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -48,12 +57,32 @@ class ClockFragment @Inject constructor(
             clockTextView.text = it.clock
             buttonFlipper.displayedChild = when (it) {
                 is ClockViewState.Idle,
-                is ClockViewState.Break -> START_BUTTON
-                is ClockViewState.Pomodoro -> STOP_BUTTON
+                is Break -> START_BUTTON
+                is Pomodoro -> STOP_BUTTON
                 is ClockViewState.Done -> TAKE_BUTTON
             }
         })
     }
+
+    override fun onStart() {
+        super.onStart()
+        requireActivity().sendNotificationCommand(HIDE)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        when (viewModel.viewState.value) {
+            is Break, is Pomodoro -> requireActivity().sendNotificationCommand(SHOW)
+        }
+    }
+
+    private fun FragmentActivity.sendNotificationCommand(command: NotificationCommand) =
+        startService(buildCommandIntent((command)))
+
+    private fun FragmentActivity.buildCommandIntent(command: NotificationCommand) =
+        Intent(this, NotificationService::class.java).apply {
+            putExtra(NOTIFICATION_SERVICE_COMMAND, command.name)
+        }
 
     private fun View.show(throwable: Throwable) {
         Timber.e(throwable)

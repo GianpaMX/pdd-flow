@@ -10,19 +10,18 @@ import io.github.gianpamx.pdd.room.AppDatabase
 import io.github.gianpamx.pdd.room.RoomPersistenceApi
 import io.github.gianpamx.pdd.room.StateLogDao
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import org.threeten.bp.Instant
 
 @Module
 class ApiModule {
     @Provides
-    @AppScope
     fun provideTimeApi() = object : TimeApi {
         override fun now() = Instant.now().epochSecond.toInt()
         override fun ticker(): Flow<Int> = kotlinx.coroutines.channels
             .ticker(1_000)
-            .consumeAsFlow()
+            .receiveAsFlow()
             .map { now() }
     }
 

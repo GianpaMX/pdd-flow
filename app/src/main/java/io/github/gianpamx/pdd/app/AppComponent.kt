@@ -4,6 +4,7 @@ import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
 import io.github.gianpamx.pdd.MainActivity
+import io.github.gianpamx.pdd.notification.NotificationService
 
 @AppScope
 @Component(
@@ -18,7 +19,9 @@ import io.github.gianpamx.pdd.MainActivity
 interface AppComponent {
     fun inject(app: App)
 
-    fun inject(app: MainActivity)
+    fun inject(activity: MainActivity)
+
+    fun inject(service: NotificationService)
 
     @Component.Builder
     interface Builder {

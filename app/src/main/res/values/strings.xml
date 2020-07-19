@@ -6,4 +6,7 @@
 
     <string name="error">Error</string>
     <string name="dismiss">Dismiss</string>
+
+    <string name="channel_name">Status bar clock</string>
+    <string name="channel_description">Show a running clock when you leave the app</string>
 </resources>

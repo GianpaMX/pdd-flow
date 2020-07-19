@@ -9,6 +9,7 @@ import io.github.gianpamx.pdd.domain.ObserveState
 import io.github.gianpamx.pdd.domain.ObserveState.State
 import io.github.gianpamx.pdd.domain.ObserveState.State.Idle.time
 import io.github.gianpamx.pdd.domain.entity.Action
+import io.github.gianpamx.pdd.toClock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
@@ -61,16 +62,5 @@ class ClockViewModel @Inject constructor(
         is State.Pomodoro -> ClockViewState.Pomodoro(time.toClock())
         is State.Done -> ClockViewState.Done(0.toClock())
         is State.Break -> ClockViewState.Break(time.toClock())
-    }
-
-    private fun Int.toClock() = "${minutes()}:${seconds()}"
-    private fun Int.minutes() = this / 60
-    private fun Int.seconds() = "${this % 60}".padStart(2, '0')
-
-    private fun State.hasTimeUp(block: () -> Unit) {
-        when (this) {
-            is State.Pomodoro -> if (this.time == 0) block.invoke()
-            is State.Break -> if (this.time == 0) block.invoke()
-        }
     }
 }

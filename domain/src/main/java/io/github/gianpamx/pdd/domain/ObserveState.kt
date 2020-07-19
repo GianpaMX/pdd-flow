@@ -26,6 +26,13 @@ class ObserveState(
         data class Pomodoro(val time: Int) : State()
         object Done : State()
         data class Break(val time: Int) : State()
+
+        fun hasTimeUp(block: () -> Unit) {
+            when (this) {
+                is Pomodoro -> if (this.time == 0) block.invoke()
+                is Break -> if (this.time == 0) block.invoke()
+            }
+        }
     }
 
     operator fun invoke(): Flow<State> = timeApi
