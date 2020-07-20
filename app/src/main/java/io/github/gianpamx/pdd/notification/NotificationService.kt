@@ -11,11 +11,15 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import io.github.gianpamx.pdd.MainActivity
 import io.github.gianpamx.pdd.R
 import io.github.gianpamx.pdd.app.ComponentApp
 import io.github.gianpamx.pdd.notification.NotificationCommand.HIDE
 import io.github.gianpamx.pdd.notification.NotificationCommand.SHOW
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 import javax.inject.Inject
 
 const val NOTIFICATION_SERVICE_COMMAND = "NOTIFICATION_SERVICE_COMMAND"
@@ -66,7 +70,11 @@ class NotificationService : LifecycleService() {
             .setContentIntent(pendingIntent)
             .setOnlyAlertOnce(true)
 
-        viewModel.state.observe(this, Observer {
+        viewModel.errors
+            .onEach { Timber.e(it) }
+            .launchIn(lifecycleScope)
+
+        viewModel.notificationState.observe(this, Observer {
             with(NotificationManagerCompat.from(this)) {
                 notificationBuilder.setContentTitle(it.clock)
                 notify(NOTIFICATION_ID, notificationBuilder.build())

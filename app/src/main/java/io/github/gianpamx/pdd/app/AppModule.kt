@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import dagger.Module
 import dagger.Provides
+import io.github.gianpamx.pdd.domain.NextState
 import io.github.gianpamx.pdd.domain.ObserveState
 import io.github.gianpamx.pdd.notification.NotificationViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,6 +21,7 @@ class AppModule {
     @Provides
     fun provideNotificationViewModel(
         observeState: ObserveState,
+        nextState: NextState,
         defaultDispatcher: CoroutineDispatcher
-    ) = NotificationViewModel(observeState, defaultDispatcher)
+    ) = NotificationViewModel(observeState, nextState, defaultDispatcher)
 }
