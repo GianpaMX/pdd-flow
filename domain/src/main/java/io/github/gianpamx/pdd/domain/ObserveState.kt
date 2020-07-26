@@ -2,6 +2,7 @@ package io.github.gianpamx.pdd.domain
 
 import io.github.gianpamx.pdd.domain.api.PersistenceApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
+import io.github.gianpamx.pdd.domain.entity.Action
 import io.github.gianpamx.pdd.domain.entity.State.BREAK
 import io.github.gianpamx.pdd.domain.entity.State.DONE
 import io.github.gianpamx.pdd.domain.entity.State.IDLE
@@ -10,11 +11,13 @@ import io.github.gianpamx.pdd.domain.entity.Transition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 
 private const val POMODORO_LENGTH = 25 * 60
 private const val BREAK_LENGTH = 5 * 60
 
 class ObserveState(
+    private val nextState: NextState,
     private val persistenceApi: PersistenceApi,
     private val timeApi: TimeApi
 ) {
@@ -26,13 +29,6 @@ class ObserveState(
         data class Pomodoro(val time: Int) : State()
         object Done : State()
         data class Break(val time: Int) : State()
-
-        fun hasTimeUp(block: () -> Unit) {
-            when (this) {
-                is Pomodoro -> if (this.time == 0) block.invoke()
-                is Break -> if (this.time == 0) block.invoke()
-            }
-        }
     }
 
     operator fun invoke(): Flow<State> = timeApi
@@ -41,6 +37,18 @@ class ObserveState(
             transition.toState(now)
         }
         .distinctUntilChanged()
+        .onEach {
+            when (it) {
+                is State.Pomodoro, is State.Break -> it.ifTimeUp { nextState(Action.COMPLETE) }
+            }
+        }
+
+    private suspend fun State.ifTimeUp(block: suspend () -> Unit) {
+        when (this) {
+            is State.Pomodoro -> if (this.time == 0) block.invoke()
+            is State.Break -> if (this.time == 0) block.invoke()
+        }
+    }
 
     private fun Transition.toState(now: Int) = when (state) {
         IDLE -> State.Idle

@@ -14,9 +14,7 @@ import io.github.gianpamx.pdd.domain.ObserveState.State
 import io.github.gianpamx.pdd.domain.entity.Action
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -155,37 +153,11 @@ class ClockViewModelTest {
     }
 
     @Test
-    fun `Complete pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
-        whenever(observeState.invoke())
-            .thenReturn((POMODORO_LENGTH downTo 0).asFlow().map { State.Pomodoro(it) })
-        viewModel = ClockViewModel(observeState, nextState, coroutineRule.testDispatcher)
-
-        viewModel.viewState.observeForTesting {
-            assertThat(viewModel.viewState.value).isInstanceOf(ClockViewState.Pomodoro::class.java)
-        }
-
-        verify(nextState).invoke(Action.COMPLETE)
-    }
-
-    @Test
     fun `Take break`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(observeState.invoke()).thenReturn(flowOf(State.Done))
 
         viewModel.take()
 
         verify(nextState).invoke(Action.TAKE)
-    }
-
-    @Test
-    fun `Complete break`() = coroutineRule.testDispatcher.runBlockingTest {
-        whenever(observeState.invoke())
-            .thenReturn((BREAK_LENGTH downTo 0).asFlow().map { State.Break(it) })
-        viewModel = ClockViewModel(observeState, nextState, coroutineRule.testDispatcher)
-
-        viewModel.viewState.observeForTesting {
-            assertThat(viewModel.viewState.value).isInstanceOf(ClockViewState.Break::class.java)
-        }
-
-        verify(nextState).invoke(Action.COMPLETE)
     }
 }

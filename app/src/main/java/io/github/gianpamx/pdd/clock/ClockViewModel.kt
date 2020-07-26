@@ -16,7 +16,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,11 +29,6 @@ class ClockViewModel @Inject constructor(
     val errors = errorChannel.asFlow()
 
     val viewState: LiveData<ClockViewState> = observeState()
-        .onEach {
-            when (it) {
-                is State.Pomodoro, is State.Break -> it.hasTimeUp { complete() }
-            }
-        }
         .map { it.toViewState() }
         .flowOn(defaultDispatcher)
         .asLiveData(viewModelScope.coroutineContext)
@@ -42,8 +36,6 @@ class ClockViewModel @Inject constructor(
     fun start() = launchNextState(Action.START)
 
     fun stop() = launchNextState(Action.STOP)
-
-    private fun complete() = launchNextState(Action.COMPLETE)
 
     fun take() = launchNextState(Action.TAKE)
 

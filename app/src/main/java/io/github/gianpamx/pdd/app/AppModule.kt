@@ -21,7 +21,6 @@ class AppModule {
     @Provides
     fun provideNotificationViewModel(
         observeState: ObserveState,
-        nextState: NextState,
         defaultDispatcher: CoroutineDispatcher
-    ) = NotificationViewModel(observeState, nextState, defaultDispatcher)
+    ) = NotificationViewModel(observeState, defaultDispatcher)
 }

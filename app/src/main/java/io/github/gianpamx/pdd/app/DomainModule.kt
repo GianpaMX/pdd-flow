@@ -12,8 +12,12 @@ import io.github.gianpamx.pdd.domain.api.TimeApi
 class DomainModule {
     @Provides
     @AppScope
-    fun provideObserveState(persistenceApi: PersistenceApi, timeApi: TimeApi) =
-        ObserveState(persistenceApi, timeApi)
+    fun provideObserveState(
+        nextState: NextState,
+        persistenceApi: PersistenceApi,
+        timeApi: TimeApi
+    ) =
+        ObserveState(nextState, persistenceApi, timeApi)
 
     @Provides
     @AppScope
