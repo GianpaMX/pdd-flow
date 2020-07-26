@@ -5,7 +5,7 @@ import dagger.Provides
 import io.github.gianpamx.pdd.domain.InitApp
 import io.github.gianpamx.pdd.domain.NextState
 import io.github.gianpamx.pdd.domain.ObserveState
-import io.github.gianpamx.pdd.domain.api.PersistenceApi
+import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
 
 @Module
@@ -14,18 +14,18 @@ class DomainModule {
     @AppScope
     fun provideObserveState(
         nextState: NextState,
-        persistenceApi: PersistenceApi,
+        transitionApi: TransitionApi,
         timeApi: TimeApi
     ) =
-        ObserveState(nextState, persistenceApi, timeApi)
+        ObserveState(nextState, transitionApi, timeApi)
 
     @Provides
     @AppScope
-    fun provideInitApp(persistenceApi: PersistenceApi, timeApi: TimeApi) =
-        InitApp(persistenceApi, timeApi)
+    fun provideInitApp(transitionApi: TransitionApi, timeApi: TimeApi) =
+        InitApp(transitionApi, timeApi)
 
     @Provides
     @AppScope
-    fun provideNextState(persistenceApi: PersistenceApi, timeApi: TimeApi) =
-        NextState(persistenceApi, timeApi)
+    fun provideNextState(transitionApi: TransitionApi, timeApi: TimeApi) =
+        NextState(transitionApi, timeApi)
 }

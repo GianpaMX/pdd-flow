@@ -1,17 +1,17 @@
 package io.github.gianpamx.pdd.domain
 
-import io.github.gianpamx.pdd.domain.api.PersistenceApi
+import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
 import io.github.gianpamx.pdd.domain.entity.Action
 import io.github.gianpamx.pdd.domain.entity.State
 
 class NextState(
-    private val persistenceApi: PersistenceApi,
+    private val transitionApi: TransitionApi,
     private val timeApi: TimeApi
 ) {
     suspend operator fun invoke(action: Action): State {
-        val currentState = persistenceApi
-            .getLastStateLog()
+        val currentState = transitionApi
+            .getLastTransition()
             ?.state
             ?: throw IllegalNullStateException
 
@@ -25,7 +25,7 @@ class NextState(
             else -> throw IllegalActionException(currentState, action)
         }
 
-        persistenceApi.newStateLog(timeApi.now(), nextState)
+        transitionApi.newTransition(timeApi.now(), nextState)
 
         return nextState
     }

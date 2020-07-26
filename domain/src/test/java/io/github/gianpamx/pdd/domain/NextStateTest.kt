@@ -2,7 +2,7 @@ package io.github.gianpamx.pdd.domain
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import io.github.gianpamx.pdd.domain.api.PersistenceApi
+import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
 import io.github.gianpamx.pdd.domain.entity.Action
 import io.github.gianpamx.pdd.domain.entity.State
@@ -13,19 +13,19 @@ import org.junit.Before
 import org.junit.Test
 
 class NextStateTest {
-    private val persistenceApi: PersistenceApi = mock()
+    private val transitionApi: TransitionApi = mock()
     private val timeApi: TimeApi = mock()
 
     private lateinit var nextState: NextState
 
     @Before
     fun setUp() {
-        nextState = NextState(persistenceApi, timeApi)
+        nextState = NextState(transitionApi, timeApi)
     }
 
     @Test(expected = IllegalNullStateException::class)
     fun `Init App should have been executed before`() = runBlockingTest {
-        whenever(persistenceApi.getLastStateLog()).thenReturn(null)
+        whenever(transitionApi.getLastTransition()).thenReturn(null)
 
         nextState.invoke(Action.START)
 
@@ -34,7 +34,7 @@ class NextStateTest {
 
     @Test(expected = IllegalActionException::class)
     fun `Invalid Stop on Idle State`() = runBlockingTest {
-        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.IDLE))
+        whenever(transitionApi.getLastTransition()).thenReturn(dummyTransition(state = State.IDLE))
 
         nextState.invoke(Action.STOP)
 
@@ -43,7 +43,7 @@ class NextStateTest {
 
     @Test
     fun `Start Pomodoro`() = runBlockingTest {
-        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.IDLE))
+        whenever(transitionApi.getLastTransition()).thenReturn(dummyTransition(state = State.IDLE))
 
         val state = nextState.invoke(Action.START)
 
@@ -52,7 +52,7 @@ class NextStateTest {
 
     @Test
     fun `Stop Pomodoro`() = runBlockingTest {
-        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.POMODORO))
+        whenever(transitionApi.getLastTransition()).thenReturn(dummyTransition(state = State.POMODORO))
 
         val state = nextState.invoke(Action.STOP)
 
@@ -61,7 +61,7 @@ class NextStateTest {
 
     @Test
     fun `Complete Pomodoro`() = runBlockingTest {
-        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.POMODORO))
+        whenever(transitionApi.getLastTransition()).thenReturn(dummyTransition(state = State.POMODORO))
 
         val state = nextState.invoke(Action.COMPLETE)
 
@@ -70,7 +70,7 @@ class NextStateTest {
 
     @Test
     fun `Take Break`() = runBlockingTest {
-        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.DONE))
+        whenever(transitionApi.getLastTransition()).thenReturn(dummyTransition(state = State.DONE))
 
         val state = nextState.invoke(Action.TAKE)
 
@@ -79,7 +79,7 @@ class NextStateTest {
 
     @Test
     fun `Start Pomodoro from Break`() = runBlockingTest {
-        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.BREAK))
+        whenever(transitionApi.getLastTransition()).thenReturn(dummyTransition(state = State.BREAK))
 
         val state = nextState.invoke(Action.START)
 
@@ -88,7 +88,7 @@ class NextStateTest {
 
     @Test
     fun `Complete Break`() = runBlockingTest {
-        whenever(persistenceApi.getLastStateLog()).thenReturn(dummyTransition(state = State.BREAK))
+        whenever(transitionApi.getLastTransition()).thenReturn(dummyTransition(state = State.BREAK))
 
         val state = nextState.invoke(Action.COMPLETE)
 

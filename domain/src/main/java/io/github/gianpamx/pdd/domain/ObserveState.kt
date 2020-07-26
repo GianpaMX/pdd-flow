@@ -1,6 +1,6 @@
 package io.github.gianpamx.pdd.domain
 
-import io.github.gianpamx.pdd.domain.api.PersistenceApi
+import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
 import io.github.gianpamx.pdd.domain.entity.Action
 import io.github.gianpamx.pdd.domain.entity.State.BREAK
@@ -18,7 +18,7 @@ private const val BREAK_LENGTH = 5 * 60
 
 class ObserveState(
     private val nextState: NextState,
-    private val persistenceApi: PersistenceApi,
+    private val transitionApi: TransitionApi,
     private val timeApi: TimeApi
 ) {
     sealed class State {
@@ -33,7 +33,7 @@ class ObserveState(
 
     operator fun invoke(): Flow<State> = timeApi
         .ticker()
-        .combine(persistenceApi.observeStateLog()) { now, transition ->
+        .combine(transitionApi.observeTransitionLog()) { now, transition ->
             transition.toState(now)
         }
         .distinctUntilChanged()
