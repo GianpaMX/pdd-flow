@@ -1,13 +1,16 @@
 package io.github.gianpamx.pdd.domain
 
-import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
+import io.github.gianpamx.pdd.domain.api.TransitionApi
+import io.github.gianpamx.pdd.domain.api.ZenModeApi
 import io.github.gianpamx.pdd.domain.entity.Action
 import io.github.gianpamx.pdd.domain.entity.State.BREAK
 import io.github.gianpamx.pdd.domain.entity.State.DONE
 import io.github.gianpamx.pdd.domain.entity.State.IDLE
 import io.github.gianpamx.pdd.domain.entity.State.POMODORO
 import io.github.gianpamx.pdd.domain.entity.Transition
+import io.github.gianpamx.pdd.domain.entity.ZenMode
+import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -19,7 +22,9 @@ private const val BREAK_LENGTH = 5 * 60
 class ObserveState(
     private val nextState: NextState,
     private val transitionApi: TransitionApi,
-    private val timeApi: TimeApi
+    private val timeApi: TimeApi,
+    private val zenModeApi: ZenModeApi,
+    private val errorChannel: BroadcastChannel<Throwable>
 ) {
     sealed class State {
         object Idle : State() {
@@ -38,15 +43,38 @@ class ObserveState(
         }
         .distinctUntilChanged()
         .onEach {
-            when (it) {
-                is State.Pomodoro, is State.Break -> it.ifTimeUp { nextState(Action.COMPLETE) }
+            try {
+                if (it is State.Pomodoro) turnOnZenMode() else turnOffZenMode()
+            } catch (e: Exception) {
+                errorChannel.send(e)
+            }
+        }
+        .onEach {
+            if (it is State.Pomodoro || it is State.Break) it.doOnTimeUp {
+                nextState(Action.COMPLETE)
             }
         }
 
-    private suspend fun State.ifTimeUp(block: suspend () -> Unit) {
+    private suspend fun State.doOnTimeUp(block: suspend () -> Unit) {
         when (this) {
             is State.Pomodoro -> if (this.time == 0) block.invoke()
             is State.Break -> if (this.time == 0) block.invoke()
+        }
+    }
+
+    private var originalMode: ZenMode? = null
+
+    private fun turnOnZenMode() {
+        if (zenModeApi.mode != ZenMode.AlarmsOnly) {
+            originalMode = zenModeApi.mode
+            zenModeApi.mode = ZenMode.AlarmsOnly
+        }
+    }
+
+    private fun turnOffZenMode() {
+        originalMode?.let {
+            zenModeApi.mode = it
+            originalMode = null
         }
     }
 

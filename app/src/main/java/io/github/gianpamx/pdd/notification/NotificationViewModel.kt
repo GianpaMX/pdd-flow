@@ -6,19 +6,18 @@ import io.github.gianpamx.pdd.domain.ObserveState.State
 import io.github.gianpamx.pdd.toClock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
 class NotificationViewModel(
     observeState: ObserveState,
+    errorChannel: BroadcastChannel<Throwable>,
     defaultDispatcher: CoroutineDispatcher
 ) {
-    private val errorChannel = BroadcastChannel<Throwable>(Channel.CONFLATED)
-
-    val errors = errorChannel.asFlow()
+    val errors = errorChannel.asFlow().distinctUntilChanged()
 
     val notificationState = observeState()
         .map { it.toNotificationState() }

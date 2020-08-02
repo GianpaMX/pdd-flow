@@ -5,8 +5,10 @@ import dagger.Provides
 import io.github.gianpamx.pdd.domain.InitApp
 import io.github.gianpamx.pdd.domain.NextState
 import io.github.gianpamx.pdd.domain.ObserveState
-import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
+import io.github.gianpamx.pdd.domain.api.TransitionApi
+import io.github.gianpamx.pdd.domain.api.ZenModeApi
+import kotlinx.coroutines.channels.BroadcastChannel
 
 @Module
 class DomainModule {
@@ -15,9 +17,11 @@ class DomainModule {
     fun provideObserveState(
         nextState: NextState,
         transitionApi: TransitionApi,
-        timeApi: TimeApi
+        timeApi: TimeApi,
+        zenModeApi: ZenModeApi,
+        errorChannel: BroadcastChannel<Throwable>
     ) =
-        ObserveState(nextState, transitionApi, timeApi)
+        ObserveState(nextState, transitionApi, timeApi, zenModeApi, errorChannel)
 
     @Provides
     @AppScope

@@ -3,6 +3,7 @@
     package="io.github.gianpamx.pdd">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
     <application
         android:name=".app.App"
