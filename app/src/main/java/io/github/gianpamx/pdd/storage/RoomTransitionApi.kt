@@ -1,9 +1,9 @@
-package io.github.gianpamx.pdd.room
+package io.github.gianpamx.pdd.storage
 
 import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.entity.State
 import io.github.gianpamx.pdd.domain.entity.Transition
-import io.github.gianpamx.pdd.room.entity.StateLog
+import io.github.gianpamx.pdd.storage.entity.StateLog
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map

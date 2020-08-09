@@ -3,7 +3,9 @@ package io.github.gianpamx.pdd.app
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Context.NOTIFICATION_SERVICE
+import android.content.SharedPreferences
 import dagger.Module
 import dagger.Provides
 import io.github.gianpamx.pdd.domain.ObserveState
@@ -39,4 +41,9 @@ class AppModule {
     @Provides
     @AppScope
     fun provideErrorChannel() = BroadcastChannel<Throwable>(Channel.CONFLATED)
+
+    @Provides
+    @AppScope
+    fun provideSharedPreferences(context: Context): SharedPreferences =
+        context.getSharedPreferences("internal", MODE_PRIVATE)
 }

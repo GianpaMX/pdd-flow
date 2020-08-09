@@ -1,5 +1,6 @@
 package io.github.gianpamx.pdd.domain
 
+import io.github.gianpamx.pdd.domain.api.StorageApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
 import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.api.ZenModeApi
@@ -24,6 +25,7 @@ class ObserveState(
     private val transitionApi: TransitionApi,
     private val timeApi: TimeApi,
     private val zenModeApi: ZenModeApi,
+    private val storageApi: StorageApi,
     private val errorChannel: BroadcastChannel<Throwable>
 ) {
     sealed class State {
@@ -62,19 +64,16 @@ class ObserveState(
         }
     }
 
-    private var originalMode: ZenMode? = null
-
     private fun turnOnZenMode() {
         if (zenModeApi.mode != ZenMode.AlarmsOnly) {
-            originalMode = zenModeApi.mode
+            storageApi.originalMode = zenModeApi.mode
             zenModeApi.mode = ZenMode.AlarmsOnly
         }
     }
 
     private fun turnOffZenMode() {
-        originalMode?.let {
+        storageApi.originalMode?.let {
             zenModeApi.mode = it
-            originalMode = null
         }
     }
 

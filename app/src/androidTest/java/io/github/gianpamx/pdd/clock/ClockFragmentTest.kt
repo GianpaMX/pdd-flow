@@ -15,8 +15,8 @@ import io.github.gianpamx.pdd.app.TestComponent
 import io.github.gianpamx.pdd.domain.api.MockTimeApi
 import io.github.gianpamx.pdd.domain.entity.State
 import io.github.gianpamx.pdd.dummyStateLog
-import io.github.gianpamx.pdd.room.AppDatabase
-import io.github.gianpamx.pdd.room.StateLogDao
+import io.github.gianpamx.pdd.storage.AppDatabase
+import io.github.gianpamx.pdd.storage.StateLogDao
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

@@ -1,9 +1,9 @@
-package io.github.gianpamx.pdd.room
+package io.github.gianpamx.pdd.storage
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import io.github.gianpamx.pdd.room.entity.StateLog
+import io.github.gianpamx.pdd.storage.entity.StateLog
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,6 +1,6 @@
 package io.github.gianpamx.pdd
 
-import io.github.gianpamx.pdd.room.entity.StateLog
+import io.github.gianpamx.pdd.storage.entity.StateLog
 
 fun dummyStateLog(
     id: Long = 0,

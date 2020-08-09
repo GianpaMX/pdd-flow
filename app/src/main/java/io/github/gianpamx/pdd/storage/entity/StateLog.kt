@@ -1,4 +1,4 @@
-package io.github.gianpamx.pdd.room.entity
+package io.github.gianpamx.pdd.storage.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

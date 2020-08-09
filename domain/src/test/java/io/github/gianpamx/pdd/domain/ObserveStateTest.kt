@@ -7,6 +7,7 @@ import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import io.github.gianpamx.pdd.domain.api.StorageApi
 import io.github.gianpamx.pdd.domain.api.TimeApi
 import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.api.ZenModeApi
@@ -35,6 +36,10 @@ class ObserveStateTest {
     private val zenModeApi = spy(object : ZenModeApi {
         override var mode: ZenMode = ZenMode.Off
     })
+    private val storageApi: StorageApi = object : StorageApi {
+        override var originalMode: ZenMode? = null
+    }
+
     private val errorChannel: ConflatedBroadcastChannel<Throwable> = ConflatedBroadcastChannel()
 
     lateinit var observeState: ObserveState
@@ -42,7 +47,8 @@ class ObserveStateTest {
     @Before
     fun setUp() {
         whenever(timeApi.ticker()).thenReturn(flowOf(0))
-        observeState = ObserveState(nextState, transitionApi, timeApi, zenModeApi, errorChannel)
+        observeState =
+            ObserveState(nextState, transitionApi, timeApi, zenModeApi, storageApi, errorChannel)
     }
 
     @Test
@@ -88,7 +94,8 @@ class ObserveStateTest {
         whenever(timeApi.ticker()).thenReturn((0..BREAK_LENGTH).asFlow())
         whenever(transitionApi.observeTransitionLog())
             .thenReturn(flowOf(Transition(State.BREAK, 0)))
-        observeState = ObserveState(nextState, transitionApi, timeApi, zenModeApi, errorChannel)
+        observeState =
+            ObserveState(nextState, transitionApi, timeApi, zenModeApi, storageApi, errorChannel)
 
         observeState.invoke().toList()
 
@@ -100,7 +107,8 @@ class ObserveStateTest {
         whenever(timeApi.ticker()).thenReturn((0..POMODORO_LENGTH).asFlow())
         whenever(transitionApi.observeTransitionLog())
             .thenReturn(flowOf(Transition(State.POMODORO, 0)))
-        observeState = ObserveState(nextState, transitionApi, timeApi, zenModeApi, errorChannel)
+        observeState =
+            ObserveState(nextState, transitionApi, timeApi, zenModeApi, storageApi, errorChannel)
 
         observeState.invoke().toList()
 
@@ -143,7 +151,8 @@ class ObserveStateTest {
 
     @Test
     fun `Error turning on DND`() = runBlockingTest {
-        whenever(transitionApi.observeTransitionLog()).thenReturn(flowOf(Transition(State.POMODORO, 0)))
+        whenever(transitionApi.observeTransitionLog())
+            .thenReturn(flowOf(Transition(State.POMODORO, 0)))
         doThrow(ZenModeApi.AccessDeniedException(SecurityException()))
             .whenever(zenModeApi).mode = eq(ZenMode.AlarmsOnly)
 
