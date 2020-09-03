@@ -1,5 +1,6 @@
 package io.github.gianpamx.pdd.domain
 
+import app.cash.turbine.test
 import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -17,17 +18,18 @@ import io.github.gianpamx.pdd.domain.entity.Transition
 import io.github.gianpamx.pdd.domain.entity.ZenMode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.ExperimentalTime
 
 private const val POMODORO_LENGTH = 25 * 60
 private const val BREAK_LENGTH = 5 * 60
 
+@ExperimentalTime
 @ExperimentalCoroutinesApi
 class ObserveStateTest {
     private val nextState: NextState = mock()
@@ -55,9 +57,12 @@ class ObserveStateTest {
     fun `Idle State`() = runBlockingTest {
         whenever(transitionApi.observeTransitionLog()).thenReturn(flowOf(Transition(State.IDLE, 0)))
 
-        val result = observeState.invoke().toList()
+        val observeStateFlow = observeState()
 
-        assertThat(result).isEqualTo(listOf(ObserveState.State.Idle))
+        observeStateFlow.test {
+            assertThat(expectItem()).isEqualTo(ObserveState.State.Idle)
+            expectComplete()
+        }
     }
 
     @Test
@@ -65,18 +70,24 @@ class ObserveStateTest {
         whenever(transitionApi.observeTransitionLog())
             .thenReturn(flowOf(Transition(State.POMODORO, 0)))
 
-        val result = observeState.invoke().toList()
+        val observeStateFlow = observeState()
 
-        assertThat(result).isEqualTo(listOf(ObserveState.State.Pomodoro(POMODORO_LENGTH)))
+        observeStateFlow.test {
+            assertThat(expectItem()).isEqualTo(ObserveState.State.Pomodoro(POMODORO_LENGTH))
+            expectComplete()
+        }
     }
 
     @Test
     fun `Done State`() = runBlockingTest {
         whenever(transitionApi.observeTransitionLog()).thenReturn(flowOf(Transition(State.DONE, 0)))
 
-        val result = observeState.invoke().toList()
+        val observeStateFlow = observeState()
 
-        assertThat(result).isEqualTo(listOf(ObserveState.State.Done))
+        observeStateFlow.test {
+            assertThat(expectItem()).isEqualTo(ObserveState.State.Done)
+            expectComplete()
+        }
     }
 
     @Test
@@ -84,33 +95,36 @@ class ObserveStateTest {
         whenever(transitionApi.observeTransitionLog())
             .thenReturn(flowOf(Transition(State.BREAK, 0)))
 
-        val result = observeState.invoke().toList()
+        val observeStateFlow = observeState()
 
-        assertThat(result).isEqualTo(listOf(ObserveState.State.Break(BREAK_LENGTH)))
+        observeStateFlow.test {
+            assertThat(expectItem()).isEqualTo(ObserveState.State.Break(BREAK_LENGTH))
+            expectComplete()
+        }
     }
 
     @Test
     fun `Complete break`() = runBlockingTest {
-        whenever(timeApi.ticker()).thenReturn((0..BREAK_LENGTH).asFlow())
+        whenever(timeApi.ticker()).thenReturn(flowOf(BREAK_LENGTH))
         whenever(transitionApi.observeTransitionLog())
             .thenReturn(flowOf(Transition(State.BREAK, 0)))
         observeState =
             ObserveState(nextState, transitionApi, timeApi, zenModeApi, storageApi, errorChannel)
 
-        observeState.invoke().toList()
+        observeState().test { cancelAndIgnoreRemainingEvents() }
 
         verify(nextState).invoke(Action.COMPLETE)
     }
 
     @Test
     fun `Complete pomodoro`() = runBlockingTest {
-        whenever(timeApi.ticker()).thenReturn((0..POMODORO_LENGTH).asFlow())
+        whenever(timeApi.ticker()).thenReturn(flowOf(POMODORO_LENGTH))
         whenever(transitionApi.observeTransitionLog())
             .thenReturn(flowOf(Transition(State.POMODORO, 0)))
         observeState =
             ObserveState(nextState, transitionApi, timeApi, zenModeApi, storageApi, errorChannel)
 
-        observeState.invoke().toList()
+        observeState().test { cancelAndIgnoreRemainingEvents() }
 
         verify(nextState).invoke(Action.COMPLETE)
     }
@@ -126,7 +140,7 @@ class ObserveStateTest {
             )
         )
 
-        observeState.invoke().toList()
+        observeState().test { cancelAndIgnoreRemainingEvents() }
 
         verify(zenModeApi).mode = ZenMode.AlarmsOnly
         assertThat(zenModeApi.mode).isEqualTo(ZenMode.Off)
@@ -144,7 +158,7 @@ class ObserveStateTest {
             )
         )
 
-        observeState.invoke().toList()
+        observeState().test { cancelAndIgnoreRemainingEvents() }
 
         verify(zenModeApi, arrangeTestOnly()).mode = ZenMode.AlarmsOnly
     }
@@ -156,7 +170,7 @@ class ObserveStateTest {
         doThrow(ZenModeApi.AccessDeniedException(SecurityException()))
             .whenever(zenModeApi).mode = eq(ZenMode.AlarmsOnly)
 
-        observeState.invoke().toList()
+        observeState().test { cancelAndIgnoreRemainingEvents() }
 
         assertThat(errorChannel.value).isInstanceOf(ZenModeApi.AccessDeniedException::class.java)
     }

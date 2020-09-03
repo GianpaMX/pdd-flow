@@ -8,6 +8,7 @@ dependencies {
     testImplementation libraries.testing.junit
     testImplementation libraries.testing.assertj
     testImplementation libraries.testing.mockitoKotlin2
+    testImplementation libraries.testing.turbine
     testImplementation libraries.kotlin.test
 }
 
