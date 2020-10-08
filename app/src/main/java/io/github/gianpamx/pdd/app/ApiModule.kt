@@ -26,7 +26,7 @@ class ApiModule {
     fun provideTimeApi() = object : TimeApi {
         override fun now() = Instant.now().epochSecond.toInt()
         override fun ticker(): Flow<Int> = kotlinx.coroutines.channels
-            .ticker(1_000)
+            .ticker(1_000, initialDelayMillis = 0L)
             .receiveAsFlow()
             .map { now() }
     }
