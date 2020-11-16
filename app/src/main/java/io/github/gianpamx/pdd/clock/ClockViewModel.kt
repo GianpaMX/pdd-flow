@@ -69,9 +69,9 @@ class ClockViewModel @Inject constructor(
     }
 
     private fun State.toViewState(): ClockViewState = when (this) {
-        is State.Idle -> ClockViewState.Idle(time.toClock())
-        is State.Pomodoro -> ClockViewState.Pomodoro(time.toClock())
-        is State.Done -> ClockViewState.Done(0.toClock())
-        is State.Break -> ClockViewState.Break(time.toClock())
+        is State.Idle -> ClockViewState.Idle(time)
+        is State.Pomodoro -> ClockViewState.Pomodoro(time)
+        is State.Done -> ClockViewState.Done(0)
+        is State.Break -> ClockViewState.Break(time)
     }
 }

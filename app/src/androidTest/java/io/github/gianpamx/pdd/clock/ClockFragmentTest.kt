@@ -1,7 +1,7 @@
 package io.github.gianpamx.pdd.clock
 
 import androidx.fragment.app.FragmentFactory
-import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import io.github.gianpamx.pdd.MainActivity
 import io.github.gianpamx.pdd.R
 import io.github.gianpamx.pdd.app.ComponentApp
 import io.github.gianpamx.pdd.app.TestComponent
@@ -23,6 +24,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.lang.Thread.sleep
 import javax.inject.Inject
+
 
 @RunWith(AndroidJUnit4::class)
 class ClockFragmentTest {
@@ -40,11 +42,13 @@ class ClockFragmentTest {
 
     @Before
     fun setUp() {
-        val testApp = InstrumentationRegistry.getInstrumentation()
-            .targetContext
-            .applicationContext as ComponentApp
+        val testComponent = InstrumentationRegistry.getInstrumentation().targetContext.run {
+            deleteDatabase("pdd-flow")
+            deleteSharedPreferences("internal")
 
-        val testComponent = testApp.component as TestComponent
+            val testApp = applicationContext as ComponentApp
+            testApp.component as TestComponent
+        }
 
         testComponent.inject(this)
 
@@ -59,36 +63,39 @@ class ClockFragmentTest {
     @Test
     fun startPomodoro() {
         stateLogDao.insertBlocking(dummyStateLog(state = State.IDLE.name))
-        launchFragmentInContainer<ClockFragment>(factory = fragmentFactory, themeResId = R.style.Theme_AppCompat)
-        sleep(1_000)
+        ActivityScenario.launch(MainActivity::class.java).use {
 
-        onView(withId(R.id.startButton)).perform(click())
+            sleep(1_000)
+            onView(withId(R.id.startButton)).perform(click())
 
-        sleep(1_000)
-        onView(withId(R.id.stopButton)).check(matches(isDisplayed()))
+            sleep(1_000)
+            onView(withId(R.id.stopButton)).check(matches(isDisplayed()))
+        }
     }
 
     @Test
     fun stopPomodoro() {
         stateLogDao.insertBlocking(dummyStateLog(state = State.POMODORO.name))
-        launchFragmentInContainer<ClockFragment>(factory = fragmentFactory, themeResId = R.style.Theme_AppCompat)
-        sleep(1_000)
+        ActivityScenario.launch(MainActivity::class.java).use {
 
-        onView(withId(R.id.stopButton)).perform(click())
+            sleep(1_000)
+            onView(withId(R.id.stopButton)).perform(click())
 
-        sleep(1_000)
-        onView(withId(R.id.startButton)).check(matches(isDisplayed()))
+            sleep(1_000)
+            onView(withId(R.id.startButton)).check(matches(isDisplayed()))
+        }
     }
 
     @Test
     fun takeBreak() {
         stateLogDao.insertBlocking(dummyStateLog(state = State.DONE.name))
-        launchFragmentInContainer<ClockFragment>(factory = fragmentFactory, themeResId = R.style.Theme_AppCompat)
-        sleep(1_000)
+        ActivityScenario.launch(MainActivity::class.java).use {
 
-        onView(withId(R.id.takeButton)).perform(click())
+            sleep(1_000)
+            onView(withId(R.id.takeButton)).perform(click())
 
-        sleep(1_000)
-        onView(withId(R.id.startButton)).check(matches(isDisplayed()))
+            sleep(1_000)
+            onView(withId(R.id.startButton)).check(matches(isDisplayed()))
+        }
     }
 }

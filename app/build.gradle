@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -18,12 +17,18 @@ android {
 
     buildTypes {
         debug {
-            testCoverageEnabled !project.hasProperty('android.injected.invoked.from.ide')
+            testCoverageEnabled true
         }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+
+    buildFeatures {
+        compose true
+        viewBinding true
     }
 
     compileOptions {
@@ -33,6 +38,15 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+        useIR = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion compose_version
+    }
+
+    packagingOptions {
+        exclude "META-INF/**"
     }
 }
 
@@ -68,11 +82,24 @@ dependencies {
     implementation libraries.room.ktx
     androidTestImplementation libraries.room.testing
 
+    implementation libraries.compose.ui
+    implementation libraries.compose.uiTooling
+    implementation libraries.compose.foundation
+    implementation libraries.compose.material
+    implementation libraries.compose.materialIconsCore
+    implementation libraries.compose.materialIconsExtended
+    implementation libraries.compose.activity
+    implementation libraries.compose.livedata
+    implementation libraries.compose.themeAdapter
+    androidTestImplementation libraries.compose.testing
+
     testImplementation libraries.testing.junit
     testImplementation libraries.testing.assertj
     testImplementation libraries.testing.mockitoKotlin2
     testImplementation libraries.androidx.testing
     testImplementation libraries.kotlin.test
+
+    androidTestImplementation libraries.testing.runner
 
     androidTestImplementation libraries.testing.androidjunitx
     androidTestImplementation libraries.testing.androidjunitktx

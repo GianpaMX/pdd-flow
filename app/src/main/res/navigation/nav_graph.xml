@@ -8,6 +8,6 @@
     <fragment
         android:id="@+id/clockFragment"
         android:name="io.github.gianpamx.pdd.clock.ClockFragment"
-        android:label="Clock"
+        android:label="@string/app_title"
         tools:layout="@layout/clock_fragment" />
 </navigation>

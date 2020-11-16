@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/primaryColor">
 
-
-    <TextView
-        android:id="@+id/clockTextView"
-        android:layout_width="wrap_content"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        tools:text="25:00" />
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginTop="48dp" />
 
     <io.github.gianpamx.pdd.view.FabFlipper
         android:id="@+id/buttonFlipper"

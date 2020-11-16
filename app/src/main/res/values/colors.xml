@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="primaryColor">@color/pomodoroColor</color>
+    <color name="primaryLightColor">#ff939a</color>
+    <color name="primaryDarkColor">@color/darkPomodoroColor</color>
+    <color name="secondaryColor">#f4eddb</color>
+    <color name="secondaryLightColor">#ffffff</color>
+    <color name="secondaryDarkColor">#c1bba9</color>
+    <color name="primaryTextColor">#f4eddb</color>
+    <color name="secondaryTextColor">#232b55</color>
+
+    <color name="pomodoroColor">#e7626c</color>
+    <color name="darkPomodoroColor">#b03041</color>
+    <color name="breakColor">#232b55</color>
+    <color name="darkBreakColor">#00002c</color>
 </resources>

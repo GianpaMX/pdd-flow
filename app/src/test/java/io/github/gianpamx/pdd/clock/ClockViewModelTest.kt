@@ -103,7 +103,7 @@ class ClockViewModelTest {
             ClockViewModel(observeState, nextState, errorChannel, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
-            assertThat(viewModel.viewState.value?.clock).isEqualTo("0:00")
+            assertThat(viewModel.viewState.value?.clock()).isEqualTo("0:00")
         }
     }
 
@@ -115,7 +115,7 @@ class ClockViewModelTest {
             ClockViewModel(observeState, nextState, errorChannel, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
-            assertThat(viewModel.viewState.value?.clock).isEqualTo("1:00")
+            assertThat(viewModel.viewState.value?.clock()).isEqualTo("1:00")
         }
     }
 
@@ -127,7 +127,7 @@ class ClockViewModelTest {
             ClockViewModel(observeState, nextState, errorChannel, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
-            assertThat(viewModel.viewState.value?.clock).isEqualTo("25:00")
+            assertThat(viewModel.viewState.value?.clock()).isEqualTo("25:00")
         }
     }
 
@@ -139,7 +139,7 @@ class ClockViewModelTest {
             ClockViewModel(observeState, nextState, errorChannel, coroutineRule.testDispatcher)
 
         viewModel.viewState.observeForTesting {
-            assertThat(viewModel.viewState.value?.clock).isEqualTo("5:00")
+            assertThat(viewModel.viewState.value?.clock()).isEqualTo("5:00")
         }
     }
 
@@ -154,7 +154,7 @@ class ClockViewModelTest {
 
     @Test
     @InternalCoroutinesApi
-    fun `Failure tu start a pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
+    fun `Failure when starting pomodoro`() = coroutineRule.testDispatcher.runBlockingTest {
         whenever(nextState.invoke(any())).thenAnswer { throw Throwable() }
         val testCollector = TestCollector<Throwable>()
         val job = testCollector.test(this, viewModel.errors)
