@@ -5,10 +5,7 @@ import io.github.gianpamx.pdd.domain.api.TimeApi
 import io.github.gianpamx.pdd.domain.api.TransitionApi
 import io.github.gianpamx.pdd.domain.api.ZenModeApi
 import io.github.gianpamx.pdd.domain.entity.Action
-import io.github.gianpamx.pdd.domain.entity.State.BREAK
-import io.github.gianpamx.pdd.domain.entity.State.DONE
-import io.github.gianpamx.pdd.domain.entity.State.IDLE
-import io.github.gianpamx.pdd.domain.entity.State.POMODORO
+import io.github.gianpamx.pdd.domain.entity.State.*
 import io.github.gianpamx.pdd.domain.entity.Transition
 import io.github.gianpamx.pdd.domain.entity.ZenMode
 import kotlinx.coroutines.channels.BroadcastChannel

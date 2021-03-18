@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
@@ -22,7 +24,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import io.github.gianpamx.pdd.R
 import io.github.gianpamx.pdd.clicks
@@ -37,7 +38,6 @@ import io.github.gianpamx.pdd.notification.NotificationCommand
 import io.github.gianpamx.pdd.notification.NotificationCommand.HIDE
 import io.github.gianpamx.pdd.notification.NotificationCommand.SHOW
 import io.github.gianpamx.pdd.notification.NotificationService
-import io.github.gianpamx.pdd.view.FabFlipper
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -52,6 +52,8 @@ class ClockFragment @Inject constructor(
 ) : Fragment() {
     private var binding: ClockFragmentBinding? = null
     private val viewModel: ClockViewModel by viewModels { viewModelFactory }
+
+    private val mutableState: MutableState<ClockViewState> = mutableStateOf(ClockViewState.Idle())
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -101,26 +103,27 @@ class ClockFragment @Inject constructor(
                 is ClockViewState.Done -> TAKE_BUTTON
             }
         })
-    }
 
-    private fun View.updateUi(clockViewState: ClockViewState) {
-        updateClock(CenterHorizontally, clockViewState)
-        updateColors(clockViewState)
-    }
-
-    private fun View.updateClock(
-        CenterHorizontally: Alignment.Horizontal,
-        clockViewState: ClockViewState
-    ) {
         binding?.composeView?.setContent {
+            val state: ClockViewState by remember { mutableState }
+
             MdcTheme(setTextColors = true) {
-                Column(horizontalAlignment = CenterHorizontally) {
-                    Clock(time = clockViewState.clock())
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Clock(time = state.clock())
                     Spacer(modifier = Modifier.height(36.dp))
-                    BarClock(time = clockViewState.seconds / 60)
+                    BarClock(state = state, 25 * 60)
                 }
             }
         }
+    }
+
+    private fun View.updateUi(clockViewState: ClockViewState) {
+        updateClock(clockViewState)
+        updateColors(clockViewState)
+    }
+
+    private fun updateClock(clockViewState: ClockViewState) {
+        mutableState.value = clockViewState
     }
 
     private fun View.updateColors(clockViewState: ClockViewState) {
